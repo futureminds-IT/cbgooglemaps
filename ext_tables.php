@@ -1,6 +1,6 @@
 <?php
 defined('TYPO3_MODE') or die();
-
+$_EXTKEY = 'cbgooglemaps';
 // register plugin
 \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
     'Brinkert.' . $_EXTKEY,

@@ -69,7 +69,7 @@ class IncludeBeJavascript
         }
 
         // set relative extension path
-        $this->filePath = ExtensionManagementUtility::siteRelPath('cbgooglemaps');
+        $this->filePath = \TYPO3\CMS\Core\Utility\PathUtility::stripPathSitePrefix(ExtensionManagementUtility::extPath('cbgooglemaps'));
 
         // add own scripts for gmaps object and mapping functions
         $this->pagerenderer->addJsFile(

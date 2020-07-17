@@ -52,7 +52,7 @@ class MapController extends ActionController
         );
 
         // set sitepath
-        $this->filePath = ExtensionManagementUtility::siteRelPath('cbgooglemaps');
+        $this->filePath = \TYPO3\CMS\Core\Utility\PathUtility::stripPathSitePrefix(ExtensionManagementUtility::extPath('cbgooglemaps'));
 
         // set content object renderer
         $this->cobj = GeneralUtility::makeInstance(
