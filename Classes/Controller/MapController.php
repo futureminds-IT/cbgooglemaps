@@ -177,10 +177,10 @@ class MapController extends ActionController
                                  : $this->settings['display']['navigationControl']
                             ),
             // assign icon if given by constant or typoscript
-            'icon'      => null != $this->ceData['icon'] && file_exists(PATH_site . $this->ceData['icon'])
+            'icon'      => null != $this->ceData['icon'] && file_exists(\TYPO3\CMS\Core\Core\Environment::getPublicPath().'/'. $this->ceData['icon'])
                 ? GeneralUtility::getIndpEnv('TYPO3_REQUEST_HOST') . '/' . $this->ceData['icon']
                 : (
-                !empty($this->settings['display']['icon']) && file_exists(PATH_site . $this->settings['display']['icon'])
+                !empty($this->settings['display']['icon']) && file_exists(\TYPO3\CMS\Core\Core\Environment::getPublicPath().'/'. $this->settings['display']['icon'])
                     ? GeneralUtility::getIndpEnv('TYPO3_REQUEST_HOST') . '/' . $this->settings['display']['icon']
                     : null
                 ),
@@ -199,17 +199,17 @@ class MapController extends ActionController
     private function getMapStyling()
     {
         if (null != $this->ceData['mapStyling']
-            && file_exists(PATH_site . $this->ceData['mapStyling'])) {
+            && file_exists(\TYPO3\CMS\Core\Core\Environment::getPublicPath().'/'. $this->ceData['mapStyling'])) {
             // assign map styling from content element
 
-            $styling = file_get_contents(PATH_site . $this->ceData['mapStyling']);
+            $styling = file_get_contents(\TYPO3\CMS\Core\Core\Environment::getPublicPath().'/'. $this->ceData['mapStyling']);
 
             return !is_null(json_decode($styling)) ? $styling : null;
         } elseif (!empty($this->settings['display']['mapStyling'])
-            && file_exists(PATH_site . $this->settings['display']['mapStyling'])) {
+            && file_exists(\TYPO3\CMS\Core\Core\Environment::getPublicPath().'/'. $this->settings['display']['mapStyling'])) {
             // assign map styling from typoscript file definition
 
-            $styling = file_get_contents(PATH_site . $this->settings['display']['mapStyling']);
+            $styling = file_get_contents(\TYPO3\CMS\Core\Core\Environment::getPublicPath().'/'. $this->settings['display']['mapStyling']);
 
             return !is_null(json_decode($styling)) ? $styling : null;
         } elseif (!empty($this->settings['display']['mapStyling'])
