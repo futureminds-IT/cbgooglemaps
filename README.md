@@ -1,2 +1,2 @@
 cbgooglemaps
-Forked to support 10 LTS
+Forked to support 11 LTS
