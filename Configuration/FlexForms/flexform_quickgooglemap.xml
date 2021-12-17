@@ -118,6 +118,7 @@
 								<cols>50</cols>
 								<rows>10</rows>
 								<eval>trim</eval>
+								<enableRichtext>true</enableRichtext>
 							</config>
 						</TCEforms>
 					</settings.cbgmDescription>
