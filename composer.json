@@ -1,7 +1,7 @@
 {
   "name": "brinkert/cbgooglemaps",
   "type": "typo3-cms-extension",
-  "description": "formerly \"Quick Google Maps\" - Include maps by GoogleMaps, MapBox or OpenStreetMap to your frontend, in a quick and easy way - as content element, by typoscript or even with fluid cObject.",
+  "description": "Quick Maps",
   "keywords": [
     "TYPO3",
     "extension",
@@ -17,7 +17,7 @@
   ],
   "license": ["GPL-2.0-or-later"],
   "require": {
-    "typo3/cms-core": "^8.7.13 || >=9.0.0 < 10.9.99 || ^11.1"
+    "typo3/cms-core": "^8.7.13 || >=9.0.0 < 10.9.99 || ^11.1 || ^12.4"
   },
   "autoload": {
     "psr-4": {

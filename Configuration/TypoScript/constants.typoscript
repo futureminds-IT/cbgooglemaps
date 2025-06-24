@@ -1,113 +1,114 @@
+#==============================================
+# FE-Plugin configuration
+#==============================================
+# customsubcategory=1mapprovider=Map Provider
+# customsubcategory=2googlemaps=Google Maps
+# customsubcategory=3openstreetmap=Open Street Map
+# customsubcategory=4mapbox=Map Box
+# customsubcategory=5mapsetting=Settings
+
 plugin.tx_cbgooglemaps {
-	# customsubcategory=1mapprovider=LLL:EXT:cbgooglemaps/Resources/Private/Language/locallang.xml:1mapprovider
-	# customsubcategory=2googlemaps=LLL:EXT:cbgooglemaps/Resources/Private/Language/locallang.xml:2googlemaps
-	# customsubcategory=3openstreetmap=LLL:EXT:cbgooglemaps/Resources/Private/Language/locallang.xml:3openstreetmap
-	# customsubcategory=4mapbox=LLL:EXT:cbgooglemaps/Resources/Private/Language/locallang.xml:4mapbox
-	# customsubcategory=5mapsetting=LLL:EXT:cbgooglemaps/Resources/Private/Language/locallang.xml:5mapsetting
+                # cat=plugin.tx_cbgooglemaps/1mapprovider; type=options[Google,MapBox,OpenStreetMap]; label=Map Provider
+                mapProvider = Google
 
-	# cat=plugin.tx_cbgooglemaps/1mapprovider/1000; type=options[Google,MapBox,OpenStreetMap]; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.mapProvider
-	mapProvider = Google
 
-	osmapi {
-		// cat=plugin.tx_cbgooglemaps/3openstreetmap/1000; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.osmapi.js
-		js = Resources/Public/JavaScript/leaflet/leaflet.js
-		// cat=plugin.tx_cbgooglemaps/3openstreetmap/1020; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.osmapi.css
+	osmapi{
+		# cat=plugin.tx_cbgooglemaps/3openstreetmap; type=string; label=Leaflet JS
+		js  = Resources/Public/JavaScript/leaflet/leaflet.js
+		# cat=plugin.tx_cbgooglemaps/3openstreetmap; type=string; label=OpenStreetMap Styles: Set URL to openstreetmap stylessheet
 		css = Resources/Public/JavaScript/leaflet/leaflet.css
 		tileLayer {
-			// cat=plugin.tx_cbgooglemaps/3openstreetmap/1030; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.osmapi.tileLayer.template
-			template = https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png
-			// cat=plugin.tx_cbgooglemaps/3openstreetmap/1040; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.osmapi.tileLayer.attribution
-			attribution = &copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>
+			# cat=plugin.tx_cbgooglemaps/3openstreetmap; type=string; label=Tile layer template: Set template string to the tile layer
+			template 	   = https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png
+			# cat=plugin.tx_cbgooglemaps/3openstreetmap; type=string; label=Tile layer attribution: Set attribution string to the tile layer
+			attribution    = &copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>
 		}
-
-		icon {
-			// cat=plugin.tx_cbgooglemaps/3openstreetmap/1050; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.osmapi.icon.iconUrl
-			iconUrl =
-			// cat=plugin.tx_cbgooglemaps/3openstreetmap/1060; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.osmapi.icon.iconWidth
-			iconWidth =
-			// cat=plugin.tx_cbgooglemaps/3openstreetmap/1070; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.osmapi.icon.iconHeight
-			iconHeight =
-			// cat=plugin.tx_cbgooglemaps/3openstreetmap/1080; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.osmapi.icon.iconAnchorX
-			iconAnchorX =
-			// cat=plugin.tx_cbgooglemaps/3openstreetmap/1090; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.osmapi.icon.iconAnchorY
-			iconAnchorY =
-			// cat=plugin.tx_cbgooglemaps/3openstreetmap/1100; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.osmapi.icon.popupAnchorX
-			popupAnchorX = 0
-			// cat=plugin.tx_cbgooglemaps/3openstreetmap/1110; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.osmapi.icon.popupAnchorY
-			popupAnchorY = 0
-			// cat=plugin.tx_cbgooglemaps/3openstreetmap/1120; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.osmapi.icon.tooltipAnchorX
+		icon{
+			# cat=plugin.tx_cbgooglemaps/3openstreetmap; type=string; label=OpenStreetMap icon: Set URL to openstreetmap icon (f.e. fileadmin/images/osmMarker.png)
+			iconUrl        =
+			# cat=plugin.tx_cbgooglemaps/3openstreetmap; type=string; label=OpenStreetMap icon width: Set icon width in pixel
+			iconWidth      =
+			# cat=plugin.tx_cbgooglemaps/3openstreetmap; type=string; label=OpenStreetMap icon height: Set icon height in pixel
+			iconHeight     =
+			# cat=plugin.tx_cbgooglemaps/3openstreetmap; type=string; label=OpenStreetMap icon anchor X: Horizontal position (x) for marker pixel in icon (in pixel)
+			iconAnchorX    =
+			# cat=plugin.tx_cbgooglemaps/3openstreetmap; type=string; label=OpenStreetMap icon anchor Y: Vertical position (y) for marker pixel in icon (in pixel)
+			iconAnchorY    =
+			# cat=plugin.tx_cbgooglemaps/3openstreetmap; type=string; label=OpenStreetMap popup anchor X: Horizontal position (x) for popup arrow position (in pixel)
+			popupAnchorX   = 0
+			# cat=plugin.tx_cbgooglemaps/3openstreetmap; type=string; label=OpenStreetMap popup anchor Y: Vertical position (y) for popup arrow position (in pixel)
+			popupAnchorY   = 0
+			# cat=plugin.tx_cbgooglemaps/3openstreetmap; type=string; label=OpenStreetMap tooltip anchor X: Horizontal position (x) for tooltip in pixel relative to the icon
 			tooltipAnchorX = 0
-			// cat=plugin.tx_cbgooglemaps/3openstreetmap/1130; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.osmapi.icon.tooltipAnchorY
+			# cat=plugin.tx_cbgooglemaps/3openstreetmap; type=string; label=OpenStreetMap tooltip anchor Y: Vertical position (y) for tooltip in pixel relative to the icon
 			tooltipAnchorY = 0
-			// cat=plugin.tx_cbgooglemaps/3openstreetmap/1140; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.osmapi.icon.shadowUri
-			shadowUrl =
-			// cat=plugin.tx_cbgooglemaps/3openstreetmap/1150; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.osmapi.icon.shadowWidth
-			shadowWidth =
-			// cat=plugin.tx_cbgooglemaps/3openstreetmap/1160; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.osmapi.icon.shadowHeight
-			shadowHeight =
-			// cat=plugin.tx_cbgooglemaps/3openstreetmap/1170; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.osmapi.icon.shadowAnchorX
-			shadowAnchorX =
-			// cat=plugin.tx_cbgooglemaps/3openstreetmap/1180; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.osmapi.icon.shadowAnchorY
-			shadowAnchorY =
+			# cat=plugin.tx_cbgooglemaps/3openstreetmap; type=string; label=OpenStreetMap shadow url: Set URL to openstreetmap icon shadow (f.e. fileadmin/images/osmMarkerShadow.png)
+			shadowUrl      =
+			# cat=plugin.tx_cbgooglemaps/3openstreetmap; type=string; label=OpenStreetMap shadow width: Set icon shadow width in pixel
+			shadowWidth    =
+			# cat=plugin.tx_cbgooglemaps/3openstreetmap; type=string; label=OpenStreetMap shadow height: Set icon shadow height in pixel
+			shadowHeight   =
+			# cat=plugin.tx_cbgooglemaps/3openstreetmap; type=string; label=OpenStreetMap shadow anchor X: Horizontal position (x) for marker pixel in icon shadow
+			shadowAnchorX  =
+			# cat=plugin.tx_cbgooglemaps/3openstreetmap; type=string; label=OpenStreetMap shadow anchor Y: Vertical position (y) for marker pixel in icon shadow
+			shadowAnchorY  =
 		}
 	}
-
-	mapboxapi {
-		// cat=plugin.tx_cbgooglemaps/4mapbox/1200; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.mapboxapi.js
-		js = Resources/Public/JavaScript/mapbox/mapbox-gl.js
-		// cat=plugin.tx_cbgooglemaps/4mapbox/1210; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.mapboxapi.css
-		css = Resources/Public/JavaScript/mapbox/mapbox-gl.css
-		// cat=plugin.tx_cbgooglemaps/4mapbox/1220; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.mapboxapi.accessToken
+	mapboxapi{
+		# cat=plugin.tx_cbgooglemaps/4mapbox/1200; type=string; label=MapBox JS library: Set URL to mapbox javascript library
+		js 				   = Resources/Public/JavaScript/mapbox/mapbox-gl.js
+		# cat=plugin.tx_cbgooglemaps/4mapbox/1210; type=string; label=MapBox Styles: Set URL to mapbox stylessheet
+		css 			   = Resources/Public/JavaScript/mapbox/mapbox-gl.css
+		# cat=plugin.tx_cbgooglemaps/4mapbox/1220; type=string; label=MapBox access token: Set access token of mapbox, see: https://www.mapbox.com/account/access-tokens to request a token
 		accessToken =
 
-		icon {
-			// cat=plugin.tx_cbgooglemaps/4mapbox/1250; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.mapboxapi.icon.iconUrl
-			iconUrl =
-			// cat=plugin.tx_cbgooglemaps/4mapbox/1260; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.mapboxapi.icon.iconWidth
-			iconWidth =
-			// cat=plugin.tx_cbgooglemaps/4mapbox/1270; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.mapboxapi.icon.iconHeight
-			iconHeight =
-			// cat=plugin.tx_cbgooglemaps/4mapbox/1280; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.mapboxapi.icon.iconOffsetX
-			iconOffsetX =
-			// cat=plugin.tx_cbgooglemaps/4mapbox/1290; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.mapboxapi.icon.iconOffsetY
-			iconOffsetY =
+		icon{
+			# cat=plugin.tx_cbgooglemaps/4mapbox/1250; type=string; label=MapBox icon: Set URL to MapBox icon (f.e. fileadmin/images/osmMarker.png)
+			iconUrl        =
+			# cat=plugin.tx_cbgooglemaps/4mapbox/1260; type=string; label=MapBox icon width: Set icon width in pixel
+			iconWidth      =
+			# cat=plugin.tx_cbgooglemaps/4mapbox/1270; type=string; label=MapBox icon height: Set icon height in pixel
+			iconHeight     =
+			# cat=plugin.tx_cbgooglemaps/4mapbox/1280; type=string; label=MapBox icon offset x: Set icon horizontal offset in pixel
+			iconOffsetX    =
+			# cat=plugin.tx_cbgooglemaps/4mapbox/1290; type=string; label=MapBox icon offset y: Set icon vertical offset in pixel
+			iconOffsetY    =
 		}
 	}
-
 	googleapi {
-		# cat=plugin.tx_cbgooglemaps/2googlemaps/1300; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.googleapi.uri
-		uri = https://maps.googleapis.com/maps/api/js
-		# cat=plugin.tx_cbgooglemaps/2googlemaps/1310; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.googleapi.key
-		key =
+		# cat=plugin.tx_cbgooglemaps/2googlemaps/1300; type=string; label=GoogleMaps JS library: Set URL to googlemaps javascript library
+		uri 			   = https://maps.googleapis.com/maps/api/js
+		# cat=plugin.tx_cbgooglemaps/2googlemaps/1310; type=string; label=GoogleMaps api key: Set googlemaps api key see: https://developers.google.com/maps/documentation/javascript/ to request an api key
+		key 			   =
 	}
 
 	options {
-		# cat=plugin.tx_cbgooglemaps/5mapsetting/1500; type=boolean; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.options.useScrollwheel
-		useScrollwheel = true
+		# cat=plugin.tx_cbgooglemaps/5mapsetting/1500; type=boolean; label=Activate zooming by mousewheel: Use scrollwheel for zooming in maps?
+		useScrollwheel 	   = true
 	}
-
-	# cat=plugin.tx_cbgooglemaps/5mapsetting/1510; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.latitude
-	latitude =
-	# cat=plugin.tx_cbgooglemaps/5mapsetting/1520; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.longitude
-	longitude =
-	# cat=plugin.tx_cbgooglemaps/5mapsetting/1530; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.infoText
-	infoText =
-	# cat=plugin.tx_cbgooglemaps/5mapsetting/1540; type=boolean; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.infoTextOpen
-	infoTextOpen = false
+	# cat=plugin.tx_cbgooglemaps/5mapsetting/1510; type=string; label=Default latitude: Set latitude as float value, if you would like to set some default coordinates
+	latitude 			   =
+	# cat=plugin.tx_cbgooglemaps/5mapsetting/1520; type=string; label=Default longitude: Set longitude as float value, if you would like to set some default coordinates
+	longitude 			   =
+	# cat=plugin.tx_cbgooglemaps/5mapsetting/1530; type=string; label=Default info text: Set info text to be shown in the text box to the pin as default
+	infoText 			   =
+	# cat=plugin.tx_cbgooglemaps/5mapsetting/1540; type=boolean; label=Open info text box: Should info text box be opened at start?
+	infoTextOpen 		   = false
 	display {
-		# cat=plugin.tx_cbgooglemaps/5mapsetting/1550; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.display.width
-		width =
-		# cat=plugin.tx_cbgooglemaps/5mapsetting/1560; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.display.height
-		height = 250
-		# cat=plugin.tx_cbgooglemaps/5mapsetting/1580; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.display.zoom
-		zoom = 15
-		# cat=plugin.tx_cbgooglemaps/2googlemaps/1570; type=options[HYBRID,ROADMAP,SATELLITE,TERRAIN]; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.display.maptype
-		mapType = HYBRID
-		# cat=plugin.tx_cbgooglemaps/2googlemaps/1590; type=options[DEFAULT,SMALL,ZOOM_PAN,ANDROID]; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.display.mapcontrol
-		mapControl = DEFAULT
-		# cat=plugin.tx_cbgooglemaps/2googlemaps/1600; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.display.icon
-		icon =
-		# cat=plugin.tx_cbgooglemaps/5mapsetting/1610; type=string; label=LLL:EXT:cbgooglemaps/Resources/Private/language/locallang.xml:const.display.styling
-		styling =
+		# cat=plugin.tx_cbgooglemaps/5mapsetting/1550; type=string; label=Default map width: Set default width of map (in pixel), if empty 100% width will be used and map will be responsive
+		width 			   =
+		# cat=plugin.tx_cbgooglemaps/5mapsetting/1560; type=string; label=Default map height: Set default height of map (in pixel)
+		height 			   = 250
+		# cat=plugin.tx_cbgooglemaps/5mapsetting/1580; type=string; label=Default zoom level: Set default map zoom level (default = 15)
+		zoom 			   = 15
+		# cat=plugin.tx_cbgooglemaps/2googlemaps/1570; type=options[HYBRID,ROADMAP,SATELLITE,TERRAIN]; label=Default map type: Set default map type
+		mapType 		   = HYBRID
+		# cat=plugin.tx_cbgooglemaps/2googlemaps/1590; type=options[DEFAULT,SMALL,ZOOM_PAN,ANDROID]; label=Default map controls: Select map controls which should be shown in the map
+		mapControl 		   = DEFAULT
+		# cat=plugin.tx_cbgooglemaps/2googlemaps/1600; type=string; label=Map icon: Alternate map icon (only GoogleMaps): path: relative to document root (e.g. "fileadmin/images/googlePin.png"), the targeting point resides to the center bottom of the graphic file.
+		icon 			   =
+		# cat=plugin.tx_cbgooglemaps/5mapsetting/1610; type=string; label=Alternate map styling (only GoogleMaps): path: relative to document root (e.g. "fileadmin/images/googleStyles.txt").
+		styling 		   =
 	}
 }
+

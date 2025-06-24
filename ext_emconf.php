@@ -14,8 +14,8 @@ $EM_CONF[$_EXTKEY] = [
   'title' => 'Quick Maps',
   'description' => 'formerly "Quick Google Maps" - Include maps by GoogleMaps, MapBox or OpenStreetMap to your frontend, in a quick and easy way - as content element, by typoscript or even with fluid cObject.',
   'category' => 'plugin',
-  'version' => '4.0.3',
-  'state' => 'stable',
+  'version' => '5.0.3',
+  'state' => 'beta',
   'uploadfolder' => false,
   'createDirs' => '',
   'clearcacheonload' => false,
@@ -26,7 +26,7 @@ $EM_CONF[$_EXTKEY] = [
   [
     'depends' =>
     [
-      'typo3' => '9.5.1-11.5.99',
+      'typo3' => '9.5.1-12.5.99',
     ],
     'conflicts' =>
     [
