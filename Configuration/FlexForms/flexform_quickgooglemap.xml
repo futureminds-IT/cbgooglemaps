@@ -6,21 +6,16 @@
     <sheets>
         <sDEF>
             <ROOT>
-                <TCEforms>
                     <sheetTitle>LLL:EXT:cbgooglemaps/Resources/Private/Language/locallang.xlf:label.sheetLocation</sheetTitle>
-                </TCEforms>
                 <type>array</type>
                 <el>
                     <settings.cbgmIncludeJs>
-                        <TCEforms>
                             <config>
                                 <type>user</type>
                                 <renderType>jsLibrariesElement</renderType>
-                            </config>
-                        </TCEforms>
+                            </config>    
                     </settings.cbgmIncludeJs>
                     <settings.cbgmStreet>
-                        <TCEforms>
                             <label>LLL:EXT:cbgooglemaps/Resources/Private/Language/locallang.xlf:label.street</label>
                             <config>
                                 <type>input</type>
@@ -28,10 +23,8 @@
                                 <max>40</max>
                                 <eval>trim</eval>
                             </config>
-                        </TCEforms>
                     </settings.cbgmStreet>
                     <settings.cbgmZip>
-                        <TCEforms>
                             <label>LLL:EXT:cbgooglemaps/Resources/Private/Language/locallang.xlf:label.zip</label>
                             <config>
                                 <type>input</type>
@@ -39,10 +32,8 @@
                                 <max>10</max>
                                 <eval>trim</eval>
                             </config>
-                        </TCEforms>
                     </settings.cbgmZip>
                     <settings.cbgmCity>
-                        <TCEforms>
                             <label>LLL:EXT:cbgooglemaps/Resources/Private/Language/locallang.xlf:label.city</label>
                             <config>
                                 <type>input</type>
@@ -50,10 +41,8 @@
                                 <max>40</max>
                                 <eval>trim</eval>
                             </config>
-                        </TCEforms>
                     </settings.cbgmCity>
                     <settings.cbgmCountry>
-                        <TCEforms>
                             <label>LLL:EXT:cbgooglemaps/Resources/Private/Language/locallang.xlf:label.country</label>
                             <config>
                                 <type>input</type>
@@ -61,19 +50,15 @@
                                 <max>60</max>
                                 <eval>trim</eval>
                             </config>
-                        </TCEforms>
                     </settings.cbgmCountry>
                     <cbgmButtonGeocoding>
-                        <TCEforms>
                             <label></label>
                             <config>
                                 <type>user</type>
                                 <renderType>geoCodingButtonElement</renderType>
                             </config>
-                        </TCEforms>
                     </cbgmButtonGeocoding>
                     <settings.cbgmLatitude>
-                        <TCEforms>
                             <label>LLL:EXT:cbgooglemaps/Resources/Private/Language/locallang.xlf:label.latitude</label>
                             <config>
                                 <type>input</type>
@@ -81,10 +66,8 @@
                                 <max>25</max>
                                 <eval>trim</eval>
                             </config>
-                        </TCEforms>
                     </settings.cbgmLatitude>
                     <settings.cbgmLongitude>
-                        <TCEforms>
                             <label>LLL:EXT:cbgooglemaps/Resources/Private/Language/locallang.xlf:label.longitude</label>
                             <config>
                                 <type>input</type>
@@ -92,20 +75,16 @@
                                 <max>25</max>
                                 <eval>trim</eval>
                             </config>
-                        </TCEforms>
                     </settings.cbgmLongitude>
                 </el>
             </ROOT>
         </sDEF>
         <s_displayproperties>
             <ROOT>
-                <TCEforms>
                     <sheetTitle>LLL:EXT:cbgooglemaps/Resources/Private/Language/locallang.xlf:label.sheetDisplay</sheetTitle>
-                </TCEforms>
                 <type>array</type>
                 <el>
                     <settings.cbgmDescription>
-                        <TCEforms>
                             <label>LLL:EXT:cbgooglemaps/Resources/Private/Language/locallang.xlf:label.description</label>
                             <config>
                                 <type>text</type>
@@ -114,19 +93,15 @@
                                 <eval>trim</eval>
                                 <enableRichtext>true</enableRichtext>
                             </config>
-                        </TCEforms>
                     </settings.cbgmDescription>
                     <settings.cbgmAutoOpen>
-                        <TCEforms>
                             <label>LLL:EXT:cbgooglemaps/Resources/Private/Language/locallang.xlf:label.autoOpen</label>
                             <config>
                                 <type>check</type>
                                 <default>0</default>
                             </config>
-                        </TCEforms>
                     </settings.cbgmAutoOpen>
                     <settings.cbgmMapWidth>
-                        <TCEforms>
                             <label>LLL:EXT:cbgooglemaps/Resources/Private/Language/locallang.xlf:label.mapWidth</label>
                             <config>
                                 <type>input</type>
@@ -134,10 +109,8 @@
                                 <max>5</max>
                                 <eval>trim</eval>
                             </config>
-                        </TCEforms>
                     </settings.cbgmMapWidth>
                     <settings.cbgmMapHeight>
-                        <TCEforms>
                             <label>LLL:EXT:cbgooglemaps/Resources/Private/Language/locallang.xlf:label.mapHeight</label>
                             <config>
                                 <type>input</type>
@@ -146,10 +119,8 @@
                                 <eval>trim</eval>
                                 <default>250</default>
                             </config>
-                        </TCEforms>
                     </settings.cbgmMapHeight>
                     <settings.cbgmScaleLevel>
-                        <TCEforms>
                             <label>LLL:EXT:cbgooglemaps/Resources/Private/Language/locallang.xlf:label.scaleLevel</label>
                             <config>
                                 <type>input</type>
@@ -158,10 +129,8 @@
                                 <max>3</max>
                                 <default>12</default>
                             </config>
-                        </TCEforms>
                     </settings.cbgmScaleLevel>
                     <settings.cbgmMapType>
-                        <TCEforms>
                             <label>LLL:EXT:cbgooglemaps/Resources/Private/Language/locallang.xlf:label.mapType</label>
                             <config>
                                 <type>select</type>
@@ -214,10 +183,8 @@
                                     </numIndex>
                                 </items>
                             </config>
-                        </TCEforms>
                     </settings.cbgmMapType>
                     <settings.cbgmNavigationControl>
-                        <TCEforms>
                             <label>LLL:EXT:cbgooglemaps/Resources/Private/Language/locallang.xlf:label.navigationControl</label>
                             <config>
                                 <type>select</type>
@@ -246,17 +213,14 @@
                                     </numIndex>
                                 </items>
                             </config>
-                        </TCEforms>
                     </settings.cbgmNavigationControl>
 
                     <cbgmButtonGeocoding>
-                        <TCEforms>
                             <label></label>
                             <config>
                                 <type>user</type>
                                 <renderType>previewButtonElement</renderType>
                             </config>
-                        </TCEforms>
                     </cbgmButtonGeocoding>
                 </el>
             </ROOT>

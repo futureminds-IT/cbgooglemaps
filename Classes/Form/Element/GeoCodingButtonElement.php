@@ -10,7 +10,7 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 class GeoCodingButtonElement extends AbstractFormElement
 {
 
-    public function render()
+    public function render():array
     {
         /** @var ConfigurationManager $cm */
         $cm = GeneralUtility::makeInstance(ConfigurationManager::class);

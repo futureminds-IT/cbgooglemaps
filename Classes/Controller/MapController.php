@@ -5,6 +5,7 @@ namespace Brinkert\Cbgooglemaps\Controller;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Service\FlexFormService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Class to extend the backend with a tca user field
@@ -18,7 +19,7 @@ class MapController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
 {
 
     protected $ceData;
-    protected $settings;
+    protected array $settings = [];
     protected $cobj;
     protected $filePath;
 
@@ -40,12 +41,12 @@ class MapController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
     /**
      * Do some global initialization
      */
-    public function initializeAction()
+    public function initializeAction():void
     {
         // store content element data to local property
         
        
-        $this->ceData = $this->configurationManager->getContentObject()->data;
+        $this->ceData = $this->request->getAttribute('currentContentObject')->data;
         $this->data = $this->loadFlexForm($this->ceData['pi_flexform']);
 
         // get extension typoscript
@@ -99,9 +100,9 @@ private function getMapParameters()
 
     // assign uid of current content element
     if (isset($this->ceData['uid'])) {
-        $parameters['contentId'] = $this->ceData['uid'] . '_' . $this->configurationManager->getContentObject()->parentRecord['data']['uid'];
+        $parameters['contentId'] = $this->ceData['uid'] . '_' . $this->request->getAttribute('currentContentObject')->parentRecord['data']['uid'];
     } else {
-        $parameters['contentId'] = rand(1, 999999) . '_' . $this->configurationManager->getContentObject()->parentRecord['data']['uid'];
+        $parameters['contentId'] = rand(1, 999999) . '_' . $this->request->getAttribute('currentContentObject')->parentRecord['data']['uid'];
     }
 
     // map provider to build map: googleMaps or OpenStreetMap

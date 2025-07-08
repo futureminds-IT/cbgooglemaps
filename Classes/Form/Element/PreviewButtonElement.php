@@ -9,7 +9,7 @@ use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
 class PreviewButtonElement extends AbstractFormElement
 {
 
-    public function render()
+    public function render():array
     {
 
         /** @var ConfigurationManager $cm */

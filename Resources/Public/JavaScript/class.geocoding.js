@@ -417,37 +417,10 @@ function Geocoding() {
     this.setCoordinatesToBackend = function (gmap){
 
         // write results to backend form
-        var fieldPrefix = "data[tt_content][" + gmap.getUid() + "][pi_flexform][data][sDEF][lDEF]";
-
-        // ToDo - Get rid of jQuery
-
-
-        // TYPO3 <= 6.2
-        if (document.getElementsByName(fieldPrefix + "[settings.cbgmLatitude][vDEF]_hr")[0]) {
-
-            document.getElementsByName(fieldPrefix + "[settings.cbgmLatitude][vDEF]_hr")[0].value = self.gmap.getLatitude();
+        var fieldPrefix = "data[tt_content][" + this.gmap.getUid() + "][pi_flexform][data][sDEF][lDEF]";
             document.getElementsByName(fieldPrefix + "[settings.cbgmLatitude][vDEF]")[0].value = self.gmap.getLatitude();
-            document.getElementsByName(fieldPrefix + "[settings.cbgmLongitude][vDEF]_hr")[0].value = self.gmap.getLongitude();
             document.getElementsByName(fieldPrefix + "[settings.cbgmLongitude][vDEF]")[0].value = self.gmap.getLongitude();
-        }
-        // TYPO3 >= 7.x
-        else if (TYPO3.jQuery
-            && TYPO3.jQuery("input[data-formengine-input-name*=\'" + fieldPrefix + "[settings.cbgmLatitude][vDEF]\']")) {
-
-            TYPO3.jQuery("input[data-formengine-input-name*=\'" + fieldPrefix + "[settings.cbgmLatitude][vDEF]\']").val(self.gmap.getLatitude());
-            TYPO3.jQuery("input[name*=\'" + fieldPrefix + "[settings.cbgmLatitude][vDEF]\']").val(self.gmap.getLatitude());
-            TYPO3.jQuery("input[data-formengine-input-name*=\'" + fieldPrefix + "[settings.cbgmLongitude][vDEF]\']").val(self.gmap.getLongitude());
-            TYPO3.jQuery("input[name*=\'" + fieldPrefix + "[settings.cbgmLongitude][vDEF]\']").val(self.gmap.getLongitude());
-        }
-        // TYPO3 >= 10.x
-        else if (jQuery
-            && jQuery("input[data-formengine-input-name*=\'" + fieldPrefix + "[settings.cbgmLatitude][vDEF]\']")) {
-
-            jQuery("input[data-formengine-input-name*=\'" + fieldPrefix + "[settings.cbgmLatitude][vDEF]\']").val(self.gmap.getLatitude());
-            jQuery("input[name*=\'" + fieldPrefix + "[settings.cbgmLatitude][vDEF]\']").val(self.gmap.getLatitude());
-            jQuery("input[data-formengine-input-name*=\'" + fieldPrefix + "[settings.cbgmLongitude][vDEF]\']").val(self.gmap.getLongitude());
-            jQuery("input[name*=\'" + fieldPrefix + "[settings.cbgmLongitude][vDEF]\']").val(self.gmap.getLongitude());
-        }
+        
     };
 
 
