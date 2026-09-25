@@ -1,3 +1,3 @@
 cbgooglemaps
 
-Forked for TYPO3 12 compatibility
+Forked for TYPO3 13/14 compatibility
