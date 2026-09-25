@@ -63,6 +63,15 @@ class JsLibrariesElement extends AbstractFormElement
                 'stylesheet', 'all', '', FALSE, FALSE, '', TRUE);
         }
 
+        // Kontrast der Infoblase: Mapbox setzt im Library-CSS (mapbox-gl.css)
+        // nur den weissen Hintergrund, aber KEINE Schriftfarbe - die Vorschau-
+        // Karte erbte dadurch die Textfarbe ihrer Umgebung (im dunklen Bereich
+        // weiss auf weiss). Dieselbe Regel wie im Frontend
+        // (Resources/Public/Css/cbgooglemaps.css).
+        $pageRenderer->addCssFile(
+            $filePath . 'Resources/Public/Css/cbgooglemaps.css',
+            'stylesheet', 'all', '', FALSE, FALSE, '', TRUE);
+
         // TYPO3 14: render() hat einen strikten array-Return-Type. Dieses Element
         // hat kein eigenes Feld-UI - es laedt nur Karten-JS/CSS ins Backend-Formular
         // (fuer Geo-Coding- und Map-Preview-Button). Ohne return: 500

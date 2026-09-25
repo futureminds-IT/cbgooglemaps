@@ -278,6 +278,14 @@
 <f:asset.script identifier="mapsJavaScript" src="{assets.js}" />
 <f:asset.css identifier="mapsCss" href="{assets.css}" />
 <f:comment>
+    Kontrast-Fix für die Infoblase: Mapbox setzt in seinem CSS nur einen
+    weißen Hintergrund, aber keine Schriftfarbe - in dunklen Bereichen der
+    Website wurde der Popup-Text dadurch weiß auf weiß. Die Regel steht in
+    Resources/Public/Css/cbgooglemaps.css und wird bewusst NACH dem
+    Library-CSS eingebunden (siehe Kommentar dort).
+</f:comment>
+<f:asset.css identifier="cbgooglemapsContrast" href="EXT:cbgooglemaps/Resources/Public/Css/cbgooglemaps.css" />
+<f:comment>
     Leaflet-Gesture-Handling greift auf das globale L zu und lieff bisher bei
     jedem Kartenanbieter - bei Google/Mapbox dadurch "L is not defined".
 </f:comment>

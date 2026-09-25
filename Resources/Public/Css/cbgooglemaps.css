@@ -1,0 +1,43 @@
+/*
+ * Kontrast in den Karten-Infoblasen (Futureminds-Fork).
+ *
+ * Mapbox GL setzt in mapbox-gl.css fuer .mapboxgl-popup-content nur einen
+ * weissen Hintergrund (background:#fff), aber KEINE Schriftfarbe. Der Text
+ * in der Infoblase erbt dadurch die Textfarbe der Website - liegt die Karte
+ * in einem dunklen Bereich (weisse Schrift), erscheint die Infoblase als
+ * weiss auf weiss und ist unlesbar.
+ *
+ * Deshalb hier explizit dunkle Schrift. Selektoren mit .cbQuickGoogleMap
+ * davor, damit die Regel unabhaengig von der Ladereihenfolge gewinnt.
+ *
+ * Leaflet setzt color:#333 selbst, Google rendert sein InfoWindow mit
+ * eigenen Farben - dort ist nichts zu tun.
+ */
+
+.cbQuickGoogleMap .mapboxgl-popup-content {
+    color: #000;
+}
+
+/* Links im Infotext bleiben in Textfarbe erkennbar (statt Website-Linkfarbe,
+   die im Popup unlesbar sein kann). */
+.cbQuickGoogleMap .mapboxgl-popup-content a {
+    color: inherit;
+    text-decoration: underline;
+}
+
+/*
+ * Google Maps: google.maps.InfoWindow setzt ebenfalls nur den weissen
+ * Hintergrund - die Schriftfarbe wird von der Website geerbt und ist in
+ * dunklen Bereichen damit ebenfalls weiss auf weiss. Die InfoWindow-Elemente
+ * liegen im Kartencontainer (.gm-style-iw...) und erben von dort.
+ */
+.cbQuickGoogleMap .gm-style-iw,
+.cbQuickGoogleMap .gm-style-iw-c,
+.cbQuickGoogleMap .gm-style-iw-d {
+    color: #000;
+}
+
+.cbQuickGoogleMap .gm-style-iw a {
+    color: inherit;
+    text-decoration: underline;
+}
