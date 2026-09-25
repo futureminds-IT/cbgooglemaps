@@ -106,35 +106,37 @@
         var useScrollwheel_{contentId} = '{useScrollwheel}';
 
         // get map styling
+        // Mapbox hat die klassischen v9-Styles abgeschaltet - hier auf die
+        // aktuellen Style-Versionen gemappt (v3-Standard, streets-v12 usw.).
         switch (mapType_{contentId}) <f:format.raw>{</f:format.raw>
         case "MapBox-BASIC":
-        mapType_{contentId} = 'mapbox://styles/mapbox/basic-v9';
+        mapType_{contentId} = 'mapbox://styles/mapbox/standard';
         break;
         case "MapBox-BRIGHT":
-        mapType_{contentId} = 'mapbox://styles/mapbox/bright-v9';
+        mapType_{contentId} = 'mapbox://styles/mapbox/streets-v12';
         break;
         case "MapBox-LIGHT":
-        mapType_{contentId} = 'mapbox://styles/mapbox/light-v9';
+        mapType_{contentId} = 'mapbox://styles/mapbox/light-v11';
         break;
         case "MapBox-DARK":
-        mapType_{contentId} = 'mapbox://styles/mapbox/dark-v9';
+        mapType_{contentId} = 'mapbox://styles/mapbox/dark-v11';
         break;
         case "MapBox-SATELLITE":
         mapType_{contentId} = 'mapbox://styles/mapbox/satellite-v9';
         break;
         default:
-        mapType_{contentId} = 'mapbox://styles/mapbox/streets-v9';
+        mapType_{contentId} = 'mapbox://styles/mapbox/streets-v12';
         <f:format.raw>}</f:format.raw>
 
         //
         // create map by mapboy
         mapboxgl.accessToken = '{settings.mapboxapi.accessToken}';
 
+        // minZoomnumber/maxZoomnumber waren nie gueltige Mapbox-Optionen
+        // (die heissen minZoom/maxZoom) und wurden still ignoriert.
         var mapboxmap_{contentId} = new mapboxgl.Map(<f:format.raw>{</f:format.raw>
         container: 'cbsgm_{contentId}',
             center: [{longitude}, {latitude}],       // longitude and latitude switched!
-            minZoomnumber: 0,
-            maxZoomnumber: 24,
             zoom:{mapZoom},
         style: mapType_{contentId}
         <f:format.raw>}</f:format.raw>).addControl(new mapboxgl.NavigationControl());
@@ -146,8 +148,10 @@
         <f:format.raw>}</f:format.raw>
 
         // add infotext popup if given
+        // (Popup-Variable vorbelegen: .setPopup(undefined) wirft in Mapbox v3)
+        var mapboxPopup_{contentId} = null;
         if ('' !== infoText_{contentId}) <f:format.raw>{</f:format.raw>
-        var mapboxPopup_{contentId} = new mapboxgl.Popup(<f:format.raw>{</f:format.raw> closeOnClick: true, closeButton: false <f:format.raw>}</f:format.raw>)
+        mapboxPopup_{contentId} = new mapboxgl.Popup(<f:format.raw>{</f:format.raw> closeOnClick: true, closeButton: false <f:format.raw>}</f:format.raw>)
         .setLngLat([{longitude}, {latitude}])
             .setHTML( decodeURIComponent("{infoText}").replace(/\+/g, ' '));
         <f:format.raw>}</f:format.raw>
@@ -179,8 +183,11 @@
         var mapboxMarker_{contentId} = new mapboxgl.Marker(
             <f:if condition="{settings.mapboxapi.icon.iconUrl}">mapBoxIcon_{contentId} </f:if>)
             .setLngLat([{longitude}, {latitude}])    // longitude and latitude switched!
-            .addTo(mapboxmap_{contentId})
-        .setPopup(mapboxPopup_{contentId});
+            .addTo(mapboxmap_{contentId});
+
+        if (null !== mapboxPopup_{contentId}) <f:format.raw>{</f:format.raw>
+        mapboxMarker_{contentId}.setPopup(mapboxPopup_{contentId});
+        <f:format.raw>}</f:format.raw>
 
         <f:format.raw>}</f:format.raw>, false);
     </script>
@@ -270,6 +277,12 @@
 </f:if>
 <f:asset.script identifier="mapsJavaScript" src="{assets.js}" />
 <f:asset.css identifier="mapsCss" href="{assets.css}" />
-<f:asset.script identifier="leafletgesture" src="EXT:cbgooglemaps/Resources/Public/JavaScript/leaflet/leaflet-gesture-handling.js" />           
-<f:asset.css identifier="leafletgesture" href="EXT:cbgooglemaps/Resources/Public/Css/leaflet-gesture-handling.css" />   
+<f:comment>
+    Leaflet-Gesture-Handling greift auf das globale L zu und lieff bisher bei
+    jedem Kartenanbieter - bei Google/Mapbox dadurch "L is not defined".
+</f:comment>
+<f:if condition="{mapProvider} == 'OpenStreetMap'">
+<f:asset.script identifier="leafletgesture" src="EXT:cbgooglemaps/Resources/Public/JavaScript/leaflet/leaflet-gesture-handling.js" />
+<f:asset.css identifier="leafletgesture" href="EXT:cbgooglemaps/Resources/Public/Css/leaflet-gesture-handling.css" />
+</f:if>
 </html>

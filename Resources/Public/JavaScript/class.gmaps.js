@@ -122,55 +122,82 @@ function Gmaps(){
 
 		// if google is current map provider, ask google for localization
 		if ('Google' === self.getMapProvider()) {
-            // create google geocoder object
-            var geocoder = new google.maps.Geocoder();
+            var address = this.getAddressAsString();
+            if ('' === trim(address)) {
+                alert('Bitte zuerst eine Adresse angeben (Straße, PLZ/Ort oder Land).');
+                return;
+            }
 
-            if (geocoder) {
-                // try to fetch coordinates and save them to local property
-                geocoder.geocode({'address': this.getAddressAsString()}, function (results, status) {
-                    // check if geocoding was successfull
-                    if (status === google.maps.GeocoderStatus.OK) {
+            if (!window.google || !google.maps || typeof google.maps.importLibrary !== 'function') {
+                alert('Google Maps ist nicht geladen - API-Key/Bibliotheken pruefen oder als Kartenanbieter OpenStreetMap waehlen.');
+                return;
+            }
+
+            // Aktuelle Google-Maps-JS-API: Geocoding-Bibliothek dynamisch laden.
+            // Der Status ist ein String ("OK") - google.maps.GeocoderStatus gibt es nicht mehr.
+            google.maps.importLibrary('geocoding').then(function (geocodingLibrary) {
+                var geocoder = new geocodingLibrary.Geocoder();
+
+                geocoder.geocode({address: address}, function (results, status) {
+                    if (status === 'OK' && results && results.length > 0) {
                         self.setLatitude(results[0].geometry.location.lat());
                         self.setLongitude(results[0].geometry.location.lng());
                         // return values to callback method
                         callback(self);
+                        return;
                     }
+
+                    alert('Die angegebene Adresse konnte nicht gefunden werden (Google: ' + status + ').');
                 });
-            }
+            }).catch(function () {
+                alert('Die Google-Geocoding-Bibliothek konnte nicht geladen werden.');
+            });
 
         } else if ('MapBox' === self.getMapProvider()) {
             //https://api.mapbox.com/geocoding/v5/mapbox.places/Los%20Angeles.json?access_token=your-access-token
 			// if mapbox is current map provider
 			var xhr = new XMLHttpRequest();
 			var searchUri = 'https://api.mapbox.com/geocoding/v5/mapbox.places/'
-						  +	encodeURI(this.getAddressAsString()) +'.json?access_token='+ mapboxAccesstoken;
+						  +	encodeURI(this.getAddressAsString()) +'.json?limit=1&language=de&access_token='+ mapboxAccesstoken;
 
             xhr.open('GET', searchUri );
             xhr.onload = function () {
                 // parse result string to json object
                 results = JSON.parse(xhr.response);
 
-                if (0 < results.features.length){
+                if (results.features && 0 < results.features.length){
                     self.setLatitude(parseFloat(results.features[0].geometry.coordinates[1]));
                     self.setLongitude(parseFloat(results.features[0].geometry.coordinates[0]));
                     // return values to callback method
                     callback(self);
                 } else {
-                    alert('Given address can\'t be localized.');
+                    alert('Die angegebene Adresse konnte nicht gefunden werden.');
                 }
             };
             xhr.onerror = function () {
-                alert('Localization service not available, check internet connection.');
+                alert('Der Geocoding-Dienst ist nicht erreichbar.');
             };
             xhr.send();
 
 		} else {
-			// if openstreetmap is current map provider
+			// OpenStreetMap: Nominatim (kostenlos, kein API-Key noetig)
             var xhr = new XMLHttpRequest();
-            xhr.open('GET', 'https://nominatim.openstreetmap.org/search?format=json&q='+ encodeURI(this.getAddressAsString()) );
+            var address = this.getAddressAsString();
+
+            if ('' === trim(address)) {
+                alert('Bitte zuerst eine Adresse angeben (Straße, PLZ/Ort oder Land).');
+                return;
+            }
+
+            xhr.open('GET', 'https://nominatim.openstreetmap.org/search'
+                + '?format=json&limit=1&accept-language=de&q=' + encodeURI(address));
             xhr.onload = function () {
+                if (xhr.status < 200 || xhr.status >= 300) {
+                    alert('Der Geocoding-Dienst (Nominatim/OpenStreetMap) antwortet nicht (HTTP ' + xhr.status + ').');
+                    return;
+                }
             	// parse result string to json object
-                results = JSON.parse(xhr.response);
+                var results = JSON.parse(xhr.response);
 
             	if (0 < results.length){
                     self.setLatitude(parseFloat(results[0].lat));
@@ -178,11 +205,11 @@ function Gmaps(){
                     // return values to callback method
                     callback(self);
 				} else {
-            		alert('Given address can\'t be localized.');
+            		alert('Die angegebene Adresse konnte nicht gefunden werden:\n"' + address + '"');
 				}
             };
             xhr.onerror = function () {
-                alert('Localization service not available, check internet connection.');
+                alert('Der Geocoding-Dienst (Nominatim/OpenStreetMap) ist nicht erreichbar.');
             };
             xhr.send();
 		}

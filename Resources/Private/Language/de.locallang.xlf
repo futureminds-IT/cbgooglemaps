@@ -11,6 +11,18 @@
 				<source>Add a  GoogleMap, MapBox or OpenStreetMap to the current page in a quick and simple way</source>
 				<target state="translated">Füge eine GoogleMap, MapBox or OpenStreetMap zur aktuellen Seite auf einfach und schnelle Weise hinzu</target>
 			</trans-unit>
+			<trans-unit id="btnGeocoding">
+				<source>Fetch coordinates from above mentioned address</source>
+				<target state="translated">Ermittle Koordinaten aus oben genannter Adresse</target>
+			</trans-unit>
+			<trans-unit id="btnDisplayMap">
+				<source>Display current location</source>
+				<target state="translated">Zeige Kartenansicht</target>
+			</trans-unit>
+			<trans-unit id="btnPreviewMap">
+				<source>Display preview map</source>
+				<target state="translated">zeige Kartenvorschau</target>
+			</trans-unit>
 			<trans-unit id="label.street">
 				<source>Street</source>
 				<target state="translated">Straße</target>

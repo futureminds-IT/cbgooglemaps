@@ -3,25 +3,18 @@
 namespace Brinkert\Cbgooglemaps\Form\Element;
 
 use TYPO3\CMS\Backend\Form\Element\AbstractFormElement;
-use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 class JsLibrariesElement extends AbstractFormElement
 {
-    public function render()
+    use PluginTypoScriptTrait;
+
+    public function render(): array
     {
-        /** @var ConfigurationManager $cm */
-        $cm = GeneralUtility::makeInstance(ConfigurationManager::class);
-        $ts = $cm->getConfiguration($cm::CONFIGURATION_TYPE_FULL_TYPOSCRIPT);
-//        $filePath = explode('typo3conf', ExtensionManagementUtility::extPath('cbgooglemaps'))[1];
         $filePath = 'EXT:cbgooglemaps/';
 
-//        die($filePath.'Resources/Public/JavaScript/mapbox/mapbox-gl.css');
-
-
-
-        $settings = $ts['plugin.']['tx_cbgooglemaps.']['settings.'];
+        $settings = $this->getPluginSettings();
 
         $pageRenderer = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Page\PageRenderer::class);
         // add own scripts for gmaps object and mapping functions
@@ -32,18 +25,30 @@ class JsLibrariesElement extends AbstractFormElement
         $pageRenderer->addJsFile($filePath . 'Resources/Public/JavaScript/utilities.js',
             'text/javascript', FALSE, FALSE, '', FALSE);
 
+        $mapProvider = (string)($settings['mapProvider'] ?? '');
         // add map provider specific libraries
-        if ('Google' === $settings['mapProvider']) {
-            // build googlemaps library url with optional api key - if given
-            $googleMapsUri = $settings['googleapi.']['uri'];
-            if ($settings['googleapi.']['key'])
-                $googleMapsUri .= '?key=' . $settings['googleapi.']['key'];
+        if ('Google' === $mapProvider) {
+            // Google Maps JS API: aktueller Stand = dynamischer Bibliotheks-Import
+            // (v=weekly, loading=async, Bibliotheken marker+geocoding)
+            $googleMapsUri = (string)($settings['googleapi.']['uri'] ?? '');
+            if ($googleMapsUri === '') {
+                $googleMapsUri = 'https://maps.googleapis.com/maps/api/js';
+            }
+            $googleMapsParameters = [
+                'v' => 'weekly',
+                'loading' => 'async',
+                'libraries' => 'marker,geocoding',
+            ];
+            if (!empty($settings['googleapi.']['key']) && !str_contains($googleMapsUri, 'key=')) {
+                $googleMapsParameters['key'] = $settings['googleapi.']['key'];
+            }
+            $googleMapsUri .= (str_contains($googleMapsUri, '?') ? '&' : '?') . http_build_query($googleMapsParameters);
             // add google libraries
             $pageRenderer->addJsFile($googleMapsUri, 'text/javascript', FALSE, FALSE, '', TRUE);
-        } else if ('MapBox' === $settings['mapProvider']) {
+        } elseif ('MapBox' === $mapProvider) {
             // add mapbox libraries
             $pageRenderer->addJsFile(
-                $filePath . 'Resources/Public/JavaScript/mapbox/mapbox-gl-patched.js',
+                $filePath . 'Resources/Public/JavaScript/mapbox/mapbox-gl.js',
                 'text/javascript', FALSE, FALSE, '', TRUE);
             $pageRenderer->addCssFile(
                 $filePath . 'Resources/Public/JavaScript/mapbox/mapbox-gl.css',
@@ -57,5 +62,11 @@ class JsLibrariesElement extends AbstractFormElement
                 $filePath . 'Resources/Public/JavaScript/leaflet/leaflet.css',
                 'stylesheet', 'all', '', FALSE, FALSE, '', TRUE);
         }
+
+        // TYPO3 14: render() hat einen strikten array-Return-Type. Dieses Element
+        // hat kein eigenes Feld-UI - es laedt nur Karten-JS/CSS ins Backend-Formular
+        // (fuer Geo-Coding- und Map-Preview-Button). Ohne return: 500
+        // "JsLibrariesElement::render(): Return value must be of type array, none returned".
+        return $this->initializeResultArray();
     }
 }

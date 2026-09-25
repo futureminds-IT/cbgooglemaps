@@ -9,6 +9,10 @@
 
 
 
+// Google Maps: AdvancedMarkerElement benoetigt eine Map-ID, sonst rendert der
+// Marker nicht zuverlaessig; Googles Demo-ID genuegt fuer die Backend-Vorschau.
+var CBM_GOOGLE_MAP_ID = 'DEMO_MAP_ID';
+
 function Geocoding() {
 
     var self = this;
@@ -52,14 +56,18 @@ function Geocoding() {
      * @return void
      */
     this.resultsHandling = function (gmap) {
-        // work with given results
+        // Koordinaten direkt in die Backend-Formularfelder schreiben - ohne Meldung
         if (gmap && typeof(gmap.getLatitude()) === 'number' && typeof(gmap.getLongitude()) === 'number') {
-            // set new coordinates to the backend fields
-            self.setCoordinatesToBackend(gmap);
-
-        } else {
-            alert("Die angegebene Adresse konnte nicht lokalisiert werden.");
+            if (!self.setCoordinatesToBackend(gmap)) {
+                // Zielfelder nicht gefunden: nur Konsole, kein Alert
+                if (window.console && console.warn) {
+                    console.warn('cbgooglemaps: Formularfelder fuer Breite/Laenge nicht gefunden.');
+                }
+            }
+            return;
         }
+
+        alert("Die angegebene Adresse konnte nicht lokalisiert werden.");
     };
 
 
@@ -93,37 +101,36 @@ function Geocoding() {
 
             if ('Google' === mapProvider) {
 
-                // create google maps LatLng object
-                var latlng = new google.maps.LatLng(this.gmap.getLatitude(), this.gmap.getLongitude());
-                // set options object
-                var myOptions = {
-                    zoom: 15,
-                    center: latlng,
-                    mapTypeId: google.maps.MapTypeId.ROADMAP
-                };
-                // create map
-                var map = new google.maps.Map(document.getElementById("cbgm_previewLocation"), myOptions);
-                // create map marker
-                var marker = new google.maps.Marker({
-                    position: latlng,
-                    draggable: true,
-                    title: ""
+                // Aktuelle Google-Maps-JS-API: Bibliotheken dynamisch laden und
+                // AdvancedMarkerElement verwenden (google.maps.Marker ist abgekuendigt).
+                google.maps.importLibrary('maps').then(function (mapsLibrary) {
+                    return google.maps.importLibrary('marker').then(function (markerLibrary) {
+                        var position = {lat: self.gmap.getLatitude(), lng: self.gmap.getLongitude()};
+                        var map = new mapsLibrary.Map(document.getElementById('cbgm_previewLocation'), {
+                            zoom: 15,
+                            center: position,
+                            mapId: CBM_GOOGLE_MAP_ID
+                        });
+
+                        var marker = new markerLibrary.AdvancedMarkerElement({
+                            map: map,
+                            position: position,
+                            gmpDraggable: true,
+                            title: ''
+                        });
+
+                        marker.addListener('dragend', function () {
+                            // set new coordinates from marker to gmap instance
+                            self.gmap.setLatitude(marker.position.lat());
+                            self.gmap.setLongitude(marker.position.lng());
+
+                            // update coordinates to the backend fields
+                            self.setCoordinatesToBackend(self.gmap);
+                        });
+                    });
+                }).catch(function () {
+                    alert('Google Maps konnte nicht geladen werden - API-Key und Bibliotheken (maps/marker) pruefen.');
                 });
-                // add listener
-                google.maps.event.addListener(marker, 'dragend', function () {
-
-                    // set new coordinates from marker to gmap instance
-                    self.gmap.setLatitude( marker.getPosition().lat() );
-                    self.gmap.setLongitude( marker.getPosition().lng() );
-
-                    // update coordinates to the backend fields
-                    self.setCoordinatesToBackend( self.gmap );
-
-                });
-
-                // assign marker to the map
-                marker.setMap(map);
-
 
             } else if ('MapBox' === mapProvider) {
                 // display map by mapbox gl
@@ -132,16 +139,13 @@ function Geocoding() {
                 this.mapboxmap = new mapboxgl.Map({
                     container: 'cbgm_previewLocation',
                     center: [this.gmap.getLongitude(),this.gmap.getLatitude()],    // longitude and latitude switched!
-                    minZoomnumber: 0,
-                    maxZoomnumber: 24,
-                    zoom:15,
-                    style: 'mapbox://styles/mapbox/streets-v10'
+                    zoom: 15,
+                    style: 'mapbox://styles/mapbox/streets-v12'
                 }).addControl(new mapboxgl.NavigationControl());
 
-                this.mapboxMarker = new mapboxgl.Marker()
+                this.mapboxMarker = new mapboxgl.Marker({draggable: true})
                     .setLngLat([this.gmap.getLongitude(),this.gmap.getLatitude()]) // longitude and latitude switched!
                     .addTo(this.mapboxmap)
-                    .setDraggable(true)
                     .on('dragend', function(e) {
 
                         // set new coordinates from marker to gmap instance
@@ -187,7 +191,7 @@ function Geocoding() {
                     });
             }
         } else {
-            alert("No coordinates or location given.");
+            alert("Es sind noch keine Koordinaten hinterlegt - bitte zuerst über \"Ermittle Koordinaten\" die Adresse auflösen lassen.");
         }
     };
 
@@ -240,90 +244,75 @@ function Geocoding() {
             document.getElementById('cbgm_previewMap').setAttribute("style", "width:530px; height:300px; border:1px solid #8E8E8E; ", false);
 
             if ('Google' === mapProvider){
-                // create map by google maps
+                // Aktuelle Google-Maps-JS-API: Bibliotheken dynamisch laden,
+                // AdvancedMarkerElement statt des abgekuendigten google.maps.Marker.
+                google.maps.importLibrary('maps').then(function (mapsLibrary) {
+                    return google.maps.importLibrary('marker').then(function (markerLibrary) {
+                        var position = {lat: self.gmap.getLatitude(), lng: self.gmap.getLongitude()};
+                        var myOptions = {
+                            zoom: mapZoom,
+                            center: position,
+                            mapId: CBM_GOOGLE_MAP_ID
+                        };
 
-                // create google maps LatLng object
-                var latlng = new google.maps.LatLng(this.gmap.getLatitude(), this.gmap.getLongitude());
-                // set options object
-                var myOptions = {
-                    "zoom": mapZoom,
-                    "center": latlng,
-                    "navigationControl": true
-                };
+                        // specify map type
+                        switch (mapType) {
+                            case 'ROADMAP':
+                                myOptions.mapTypeId = mapsLibrary.MapTypeId.ROADMAP;
+                                break;
+                            case 'TERRAIN':
+                                myOptions.mapTypeId = mapsLibrary.MapTypeId.TERRAIN;
+                                break;
+                            case 'SATELLITE':
+                                myOptions.mapTypeId = mapsLibrary.MapTypeId.SATELLITE;
+                                break;
+                            default:
+                                myOptions.mapTypeId = mapsLibrary.MapTypeId.HYBRID;
+                        }
 
-                // specifiy map type
-                switch (mapType) {
-                    case "ROADMAP":
-                        myOptions.mapTypeId = google.maps.MapTypeId.ROADMAP;
-                        break;
-                    case "TERRAIN":
-                        myOptions.mapTypeId = google.maps.MapTypeId.TERRAIN;
-                        break;
-                    case "SATELLITE":
-                        myOptions.mapTypeId = google.maps.MapTypeId.SATELLITE;
-                        break;
-                    default:
-                        myOptions.mapTypeId = google.maps.MapTypeId.HYBRID;
-                }
+                        // Hinweis: eigene Navigations-Control-Styles gibt es in der
+                        // aktuellen API nicht mehr - die Karte bringt ihre Controls selbst mit.
 
-                // specifiy navigation control
-                switch (mapControl) {
-                    case "SMALL":
-                        myOptions.navigationControlOptions = {style: google.maps.NavigationControlStyle.SMALL};
-                        break;
-                    case "ZOOM_PAN":
-                        myOptions.navigationControlOptions = {style: google.maps.NavigationControlStyle.ZOOM_PAN};
-                        break;
-                    case "ANDROID":
-                        myOptions.navigationControlOptions = {style: google.maps.NavigationControlStyle.ANDROID};
-                        break;
-                    default:
-                        myOptions.navigationControlOptions = {style: google.maps.NavigationControlStyle.DEFAULT};
-                }
+                        var map = new mapsLibrary.Map(document.getElementById('cbgm_previewMap'), myOptions);
+                        var marker = new markerLibrary.AdvancedMarkerElement({
+                            map: map,
+                            position: position,
+                            title: rowsInfoText[0] || ''
+                        });
 
-                // create map
-                var map = new google.maps.Map(document.getElementById("cbgm_previewMap"), myOptions);
-                // create map marker
-                var marker = new google.maps.Marker({
-                    position: latlng,
-                    title: rowsInfoText[0]
+                        // set info window
+                        if ('' !== infoText) {
+                            infoText = infoText.replace(/\n/g, '<br>');
+                            var infowindow = new mapsLibrary.InfoWindow({content: infoText});
+                            marker.addListener('click', function () {
+                                infowindow.open({map: map, anchor: marker});
+                            });
+                        }
+                    });
+                }).catch(function () {
+                    alert('Google Maps konnte nicht geladen werden - API-Key und Bibliotheken (maps/marker) pruefen.');
                 });
 
-                // set info window
-                if ('' !== infoText) {
-                    infoText = infoText.replace(/\n/g, "<br>");
-
-                    var infowindow = new google.maps.InfoWindow({content: infoText});
-                    // add listener
-                    google.maps.event.addListener(marker, 'click', function () {
-                        infowindow.open(map, marker);
-                    });
-                }
-
-                // assign marker to the map
-                marker.setMap(map);
-
-
             } else if ('MapBox' === mapProvider) {
-                // get map styling
+                // get map styling (aktuelle Mapbox-Styles, v3)
                 switch (mapType) {
                     case "MapBox-BASIC":
-                        mapType = 'mapbox://styles/mapbox/basic-v9';
+                        mapType = 'mapbox://styles/mapbox/standard';
                         break;
                     case "MapBox-BRIGHT":
-                        mapType = 'mapbox://styles/mapbox/bright-v9';
+                        mapType = 'mapbox://styles/mapbox/streets-v12';
                         break;
                     case "MapBox-LIGHT":
-                        mapType = 'mapbox://styles/mapbox/light-v9';
+                        mapType = 'mapbox://styles/mapbox/light-v11';
                         break;
                     case "MapBox-DARK":
-                        mapType = 'mapbox://styles/mapbox/dark-v9';
+                        mapType = 'mapbox://styles/mapbox/dark-v11';
                         break;
                     case "MapBox-SATELLITE":
                         mapType = 'mapbox://styles/mapbox/satellite-v9';
                         break;
                     default:
-                        mapType = 'mapbox://styles/mapbox/streets-v9';
+                        mapType = 'mapbox://styles/mapbox/streets-v12';
                 }
 
                 // create map by mapboy
@@ -332,9 +321,7 @@ function Geocoding() {
                 this.mapboxmap = new mapboxgl.Map({
                     container: 'cbgm_previewMap',
                     center: [this.gmap.getLongitude(), this.gmap.getLatitude()],       // longitude and latitude switched!
-                    minZoomnumber: 0,
-                    maxZoomnumber: 24,
-                    zoom:mapZoom,
+                    zoom: mapZoom,
                     style: mapType
                 }).addControl(new mapboxgl.NavigationControl());
 
@@ -348,9 +335,11 @@ function Geocoding() {
                 // add marker to the position
                 this.mapboxMarker = new mapboxgl.Marker()
                     .setLngLat([this.gmap.getLongitude(), this.gmap.getLatitude()])    // longitude and latitude switched!
-                    .addTo(this.mapboxmap)
-                    .setPopup(this.mapboxPopup);
+                    .addTo(this.mapboxmap);
 
+                if (this.mapboxPopup) {
+                    this.mapboxMarker.setPopup(this.mapboxPopup);
+                }
 
             } else {
                 // create map by openstreetmap
@@ -383,7 +372,7 @@ function Geocoding() {
             }
 
         } else {
-            alert("No coordinates or location given.");
+            alert("Es sind noch keine Koordinaten hinterlegt - bitte zuerst über \"Ermittle Koordinaten\" die Adresse auflösen lassen.");
         }
     };
 
@@ -411,43 +400,44 @@ function Geocoding() {
 
     /**
      * Set given coordinates to the backend fields
-     * @param gmap     Gmaps
-     * @return void
+     *
+     * TYPO3 14: jQuery wurde aus dem Backend entfernt - die alten
+     * jQuery/TYPO3.jQuery-Zweige liefen ins Leere (bzw. warfen
+     * "jQuery is not defined"), dadurch wurden die Koordinaten nie
+     * in das Formular geschrieben.
+     *
+     * @param gmap Gmaps
      */
-    this.setCoordinatesToBackend = function (gmap){
+    this.setCoordinatesToBackend = function (gmap) {
 
-        // write results to backend form
         var fieldPrefix = "data[tt_content][" + gmap.getUid() + "][pi_flexform][data][sDEF][lDEF]";
 
-        // ToDo - Get rid of jQuery
+        var latitudeStored = this.setFormEngineFieldValue(fieldPrefix + "[settings.cbgmLatitude][vDEF]", String(gmap.getLatitude()));
+        var longitudeStored = this.setFormEngineFieldValue(fieldPrefix + "[settings.cbgmLongitude][vDEF]", String(gmap.getLongitude()));
 
+        return latitudeStored && longitudeStored;
+    };
 
-        // TYPO3 <= 6.2
-        if (document.getElementsByName(fieldPrefix + "[settings.cbgmLatitude][vDEF]_hr")[0]) {
+    /**
+     * Wert in ein FormEngine-Feld schreiben (sichtbares Feld + Hidden-Feld)
+     * und die Events ausloesen, damit TYPO3 den Wert uebernimmt.
+     *
+     * @param fieldName string kompletter Feldname wie im Backend-Formular
+     * @param value string
+     * @return bool true, wenn mindestens ein Feld gefunden wurde
+     */
+    this.setFormEngineFieldValue = function (fieldName, value) {
+        var fields = document.querySelectorAll(
+            '[data-formengine-input-name="' + fieldName + '"], [name="' + fieldName + '"]'
+        );
 
-            document.getElementsByName(fieldPrefix + "[settings.cbgmLatitude][vDEF]_hr")[0].value = self.gmap.getLatitude();
-            document.getElementsByName(fieldPrefix + "[settings.cbgmLatitude][vDEF]")[0].value = self.gmap.getLatitude();
-            document.getElementsByName(fieldPrefix + "[settings.cbgmLongitude][vDEF]_hr")[0].value = self.gmap.getLongitude();
-            document.getElementsByName(fieldPrefix + "[settings.cbgmLongitude][vDEF]")[0].value = self.gmap.getLongitude();
+        for (var i = 0; i < fields.length; i++) {
+            fields[i].value = value;
+            fields[i].dispatchEvent(new Event('input', {bubbles: true}));
+            fields[i].dispatchEvent(new Event('change', {bubbles: true}));
         }
-        // TYPO3 >= 7.x
-        else if (TYPO3.jQuery
-            && TYPO3.jQuery("input[data-formengine-input-name*=\'" + fieldPrefix + "[settings.cbgmLatitude][vDEF]\']")) {
 
-            TYPO3.jQuery("input[data-formengine-input-name*=\'" + fieldPrefix + "[settings.cbgmLatitude][vDEF]\']").val(self.gmap.getLatitude());
-            TYPO3.jQuery("input[name*=\'" + fieldPrefix + "[settings.cbgmLatitude][vDEF]\']").val(self.gmap.getLatitude());
-            TYPO3.jQuery("input[data-formengine-input-name*=\'" + fieldPrefix + "[settings.cbgmLongitude][vDEF]\']").val(self.gmap.getLongitude());
-            TYPO3.jQuery("input[name*=\'" + fieldPrefix + "[settings.cbgmLongitude][vDEF]\']").val(self.gmap.getLongitude());
-        }
-        // TYPO3 >= 10.x
-        else if (jQuery
-            && jQuery("input[data-formengine-input-name*=\'" + fieldPrefix + "[settings.cbgmLatitude][vDEF]\']")) {
-
-            jQuery("input[data-formengine-input-name*=\'" + fieldPrefix + "[settings.cbgmLatitude][vDEF]\']").val(self.gmap.getLatitude());
-            jQuery("input[name*=\'" + fieldPrefix + "[settings.cbgmLatitude][vDEF]\']").val(self.gmap.getLatitude());
-            jQuery("input[data-formengine-input-name*=\'" + fieldPrefix + "[settings.cbgmLongitude][vDEF]\']").val(self.gmap.getLongitude());
-            jQuery("input[name*=\'" + fieldPrefix + "[settings.cbgmLongitude][vDEF]\']").val(self.gmap.getLongitude());
-        }
+        return fields.length > 0;
     };
 
 

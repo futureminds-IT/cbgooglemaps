@@ -18,7 +18,7 @@ class MapController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
 {
 
     protected $ceData;
-    protected $settings;
+    protected array $settings;
     protected $cobj;
     protected $filePath;
 
@@ -40,12 +40,12 @@ class MapController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
     /**
      * Do some global initialization
      */
-    public function initializeAction()
-    {
-        // store content element data to local property
+    public function initializeAction(): void
+        {
+            // store content element data to local property
         
-       
-        $this->ceData = $this->configurationManager->getContentObject()->data;
+            $contentObject = $this->request->getAttribute('currentContentObject');
+            $this->ceData = $contentObject->data;
         $this->data = $this->loadFlexForm($this->ceData['pi_flexform']);
 
         // get extension typoscript
@@ -98,10 +98,11 @@ private function getMapParameters()
     $parameters = [];
 
     // assign uid of current content element
+    $contentObject = $this->request->getAttribute('currentContentObject');
     if (isset($this->ceData['uid'])) {
-        $parameters['contentId'] = $this->ceData['uid'] . '_' . $this->configurationManager->getContentObject()->parentRecord['data']['uid'];
+        $parameters['contentId'] = $this->ceData['uid'] . '_' . $contentObject->parentRecord['data']['uid'];
     } else {
-        $parameters['contentId'] = rand(1, 999999) . '_' . $this->configurationManager->getContentObject()->parentRecord['data']['uid'];
+        $parameters['contentId'] = rand(1, 999999) . '_' . $contentObject->parentRecord['data']['uid'];
     }
 
     // map provider to build map: googleMaps or OpenStreetMap
@@ -239,9 +240,18 @@ private function getMapStyling()
             
             
 
-            // add optional or required given key
-            if (!empty($this->settings['googleapi']['key']))
-                $googleMapsUri .= '?key=' . $this->settings['googleapi']['key'];
+            // Aktuelle Google-Maps-JS-API: dynamischer Bibliotheks-Import.
+            // Ohne loading=async und libraries liefert Google nur den Legacy-Loader,
+            // in dem google.maps.Marker/Geocoder nicht mehr garantiert sind.
+            $googleMapsParameters = [
+                'v' => 'weekly',
+                'loading' => 'async',
+                'libraries' => 'marker,geocoding',
+            ];
+            if (!empty($this->settings['googleapi']['key']) && !str_contains($googleMapsUri, 'key=')) {
+                $googleMapsParameters['key'] = $this->settings['googleapi']['key'];
+            }
+            $googleMapsUri .= (str_contains($googleMapsUri, '?') ? '&' : '?') . http_build_query($googleMapsParameters);
 
             // add google api file
 //            $GLOBALS['TSFE']->additionalHeaderData['cbgooglemaps'] =

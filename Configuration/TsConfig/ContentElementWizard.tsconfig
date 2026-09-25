@@ -7,8 +7,7 @@ mod.wizards {
                     title = LLL:EXT:cbgooglemaps/Resources/Private/Language/locallang.xlf:pluginWizardTitle
                     description = LLL:EXT:cbgooglemaps/Resources/Private/Language/locallang.xlf:pluginWizardDescription
                     tt_content_defValues {
-                        CType = list
-                        list_type = cbgooglemaps_quickgooglemap
+                        CType = cbgooglemaps_quickgooglemap
                     }
                 }
             }

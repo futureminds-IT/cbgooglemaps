@@ -3,39 +3,37 @@
 namespace Brinkert\Cbgooglemaps\Form\Element;
 
 use TYPO3\CMS\Backend\Form\Element\AbstractFormElement;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 class GeoCodingButtonElement extends AbstractFormElement
 {
+    use PluginTypoScriptTrait;
 
-    public function render()
+    public function render(): array
     {
-        /** @var ConfigurationManager $cm */
-        $cm = GeneralUtility::makeInstance(ConfigurationManager::class);
-        $ts = $cm->getConfiguration($cm::CONFIGURATION_TYPE_FULL_TYPOSCRIPT);
-        $settings = $ts['plugin.']['tx_cbgooglemaps.']['settings.'];
-        $i18n = $ts['plugin.']['tx_cbgooglemaps.']['_LOCAL_LANG.'];
-        $iso2 = $GLOBALS['BE_USER']->uc['lang'] . '.';
-        $btnLabels = isset($i18n[$iso2]) ? $i18n[$iso2] : $i18n['default.'];
+        $settings = $this->getPluginSettings();
+
+        // TYPO3 14: die FormEngine-Daten enthalten nicht immer 'vanillaUid'
+        $vanillaUid = (int)($this->data['vanillaUid'] ?? $this->data['uid'] ?? 0);
+        $mapProvider = (string)($settings['mapProvider'] ?? '');
+        $mapboxToken = (string)($settings['mapboxapi.']['accessToken'] ?? '');
+        $btnGeocoding = htmlspecialchars($this->getButtonLabel('btnGeocoding', 'Ermittle Koordinaten aus oben genannter Adresse'));
+        $btnDisplayMap = htmlspecialchars($this->getButtonLabel('btnDisplayMap', 'Zeige Kartenansicht'));
 
         $fieldset = '<div class="cbgm_geocoding">';
         $fieldset .= '<input type="button" id="dogeocoding" '
-            . ' data-vanillauid="'. $this->data['vanillaUid']
-            .'" data-mapprovider="'. $settings['mapProvider']
-            .'" data-token="'. $settings['mapboxapi.']['accessToken']
-            .'" value="'
-            . $btnLabels['btnGeocoding'] . '">';
+            . ' data-vanillauid="' . $vanillaUid
+            . '" data-mapprovider="' . htmlspecialchars($mapProvider)
+            . '" data-accestoken="' . htmlspecialchars($mapboxToken)
+            . '" value="'
+            . $btnGeocoding . '">';
         $fieldset .= '<input type="button" id="dodisplaylocation" '
-            . ' data-vanillauid="'. $this->data['vanillaUid']
-            .'" data-mapprovider="'. $settings['mapProvider']
-            .'" data-token="'. $settings['mapboxapi.']['accessToken']
-            .'" value="'
-            . $btnLabels['btnDisplayMap'] . '">';
+            . ' data-vanillauid="' . $vanillaUid
+            . '" data-mapprovider="' . htmlspecialchars($mapProvider)
+            . '" data-accestoken="' . htmlspecialchars($mapboxToken)
+            . '" value="'
+            . $btnDisplayMap . '">';
         $fieldset .= '<div id="cbgm_previewLocation"></div>';
         $fieldset .= '</div>';
-
 
         $result = $this->initializeResultArray();
         $result['html'] = $fieldset;
