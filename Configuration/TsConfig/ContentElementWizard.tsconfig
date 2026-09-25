@@ -3,7 +3,7 @@ mod.wizards {
         plugins {
             elements {
                 cbgooglemaps {
-                    iconIdentifier = ce-default-icon
+                    iconIdentifier = cbgooglemaps-wizard-icon
                     title = LLL:EXT:cbgooglemaps/Resources/Private/Language/locallang.xlf:pluginWizardTitle
                     description = LLL:EXT:cbgooglemaps/Resources/Private/Language/locallang.xlf:pluginWizardDescription
                     tt_content_defValues {
