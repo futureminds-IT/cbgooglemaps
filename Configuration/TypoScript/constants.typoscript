@@ -13,10 +13,10 @@ plugin.tx_cbgooglemaps {
 
 
 	osmapi{
-		# cat=plugin.tx_cbgooglemaps/3openstreetmap; type=string; label=Leaflet JS
-		js  = Resources/Public/JavaScript/leaflet/leaflet.js
+		# cat=plugin.tx_cbgooglemaps/3openstreetmap; type=string; label=MapLibre GL JS
+		js  = Resources/Public/JavaScript/maplibre/maplibre-gl.js
 		# cat=plugin.tx_cbgooglemaps/3openstreetmap; type=string; label=OpenStreetMap Styles: Set URL to openstreetmap stylessheet
-		css = Resources/Public/JavaScript/leaflet/leaflet.css
+		css = Resources/Public/JavaScript/maplibre/maplibre-gl.css
 		tileLayer {
 			# cat=plugin.tx_cbgooglemaps/3openstreetmap; type=string; label=Tile layer template: Set template string to the tile layer
 			template 	   = https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png

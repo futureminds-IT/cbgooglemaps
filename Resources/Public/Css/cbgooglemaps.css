@@ -41,3 +41,28 @@
     color: inherit;
     text-decoration: underline;
 }
+
+
+/*
+ * MapLibre GL JS (Raster-Look fuer OpenStreetMap): maplibregl-popup-content
+ * setzt wie Mapbox nur den weissen Hintergrund, keine Schriftfarbe.
+ * Gleiche Absicherung wie oben.
+ */
+.cbQuickGoogleMap .maplibregl-popup-content {
+    color: #000;
+}
+
+.cbQuickGoogleMap .maplibregl-popup-content a {
+    color: inherit;
+    text-decoration: underline;
+}
+
+/* Der Gesture-Hinweis von MapLibre soll die Karte nicht verdecken. */
+.cbQuickGoogleMap .maplibregl-cooperative-gesture-screen {
+    border-radius: 4px;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.68);
+    color: #fff;
+    font-size: 13px;
+    text-align: center;
+}
