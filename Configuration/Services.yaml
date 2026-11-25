@@ -6,3 +6,7 @@ services:
 
     Brinkert\Cbgooglemaps\:
         resource: '../Classes/*'
+        # Upgrade-Wizards werden NICHT per Scan registriert, sondern in
+        # Configuration/Services.php bedingt (die Basisklasse/Attribut gibt es
+        # erst ab TYPO3 13.4 — in 12.4 darf die Klasse nicht geladen werden).
+        exclude: '../Classes/Updates/'

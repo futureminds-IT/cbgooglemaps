@@ -9,6 +9,15 @@
 			<trans-unit id="pluginWizardDescription">
 				<source>Add a GoogleMap, MapBox or OpenStreetMap to the current page in a quick and simple way</source>
 			</trans-unit>
+			<trans-unit id="btnGeocoding">
+				<source>Fetch coordinates from above mentioned address</source>
+			</trans-unit>
+			<trans-unit id="btnDisplayMap">
+				<source>Display current location</source>
+			</trans-unit>
+			<trans-unit id="btnPreviewMap">
+				<source>Display preview map</source>
+			</trans-unit>
 			<trans-unit id="label.street">
 				<source>Street</source>
 			</trans-unit>

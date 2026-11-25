@@ -19,17 +19,41 @@ class MapController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
 {
 
     protected $ceData;
-    protected array $settings = [];
+    protected array $settings;
     protected $cobj;
     protected $filePath;
 
+    // PHP 8.2+/TYPO3 13: dynamische Properties sind deprecated -> explizit deklarieren
+    protected FlexFormService $flexFormService;
+    protected array $data = [];
 
-    
-        // Inject FlexFormService
 
     public function __construct()
     {
         $this->flexFormService = GeneralUtility::makeInstance(FlexFormService::class);
+    }
+
+    /**
+     * TYPO3 13: Settings-Werte können als String ("A,B") oder als Array vorliegen.
+     * Liefert immer eine Liste von Strings.
+     */
+    private function toStringList($value): array
+    {
+        if (is_array($value)) {
+            $result = [];
+            foreach ($value as $item) {
+                if (is_array($item)) {
+                    $result = array_merge($result, $this->toStringList($item));
+                } elseif ($item !== null && $item !== '') {
+                    $result[] = (string)$item;
+                }
+            }
+            return $result;
+        }
+        if (!is_string($value) || trim($value) === '') {
+            return [];
+        }
+        return preg_split('/[\s]*[,][\s]*/', $value);
     }
 
     private function loadFlexForm($flexFormString): array
@@ -41,12 +65,12 @@ class MapController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
     /**
      * Do some global initialization
      */
-    public function initializeAction():void
-    {
-        // store content element data to local property
+    public function initializeAction(): void
+        {
+            // store content element data to local property
         
-       
-        $this->ceData = $this->request->getAttribute('currentContentObject')->data;
+            $contentObject = $this->request->getAttribute('currentContentObject');
+            $this->ceData = $contentObject->data;
         $this->data = $this->loadFlexForm($this->ceData['pi_flexform']);
 
         // get extension typoscript
@@ -99,10 +123,11 @@ private function getMapParameters()
     $parameters = [];
 
     // assign uid of current content element
+    $contentObject = $this->request->getAttribute('currentContentObject');
     if (isset($this->ceData['uid'])) {
-        $parameters['contentId'] = $this->ceData['uid'] . '_' . $this->request->getAttribute('currentContentObject')->parentRecord['data']['uid'];
+        $parameters['contentId'] = $this->ceData['uid'] . '_' . $contentObject->parentRecord['data']['uid'];
     } else {
-        $parameters['contentId'] = rand(1, 999999) . '_' . $this->request->getAttribute('currentContentObject')->parentRecord['data']['uid'];
+        $parameters['contentId'] = rand(1, 999999) . '_' . $contentObject->parentRecord['data']['uid'];
     }
 
     // map provider to build map: googleMaps or OpenStreetMap
@@ -156,16 +181,16 @@ private function getMapParameters()
     $parameters['mapZoom'] = isset($this->ceData['zoom']) ? (int)$this->ceData['zoom'] : ((0 <= (int)($this->settings['cbgmScaleLevel'] ?? 0) && !empty($this->settings['cbgmScaleLevel'])) ? (int)$this->settings['cbgmScaleLevel'] : (int)($this->settings['display']['zoom'] ?? ''));
 
     // assign map type to the view, if given value is valid
-    $parameters['mapType'] = (isset($this->ceData['mapType']) && in_array((string)$this->ceData['mapType'], preg_split("/[\s]*[,][\s]*/", $this->settings['valid']['mapTypes'] ?? []))) ?
+    $parameters['mapType'] = (isset($this->ceData['mapType']) && in_array((string)$this->ceData['mapType'], $this->toStringList($this->settings['valid']['mapTypes'] ?? []))) ?
         $this->ceData['mapType'] :
-        (in_array((string)($this->settings['cbgmMapType'] ?? ''), preg_split("/[\s]*[,][\s]*/", $this->settings['valid']['mapTypes'] ?? [])) ?
+        (in_array((string)($this->settings['cbgmMapType'] ?? ''), $this->toStringList($this->settings['valid']['mapTypes'] ?? [])) ?
             $this->settings['cbgmMapType'] :
             ($this->settings['display']['mapType'] ?? ''));
 
     // assign navigation controls to the view
-    $parameters['mapControl'] = (isset($this->ceData['navigationControl']) && in_array((string)$this->ceData['navigationControl'], preg_split("/[\s]*[,][\s]*/", $this->settings['valid']['navigationControl'] ?? []))) ?
+    $parameters['mapControl'] = (isset($this->ceData['navigationControl']) && in_array((string)$this->ceData['navigationControl'], $this->toStringList($this->settings['valid']['navigationControl'] ?? []))) ?
         $this->ceData['navigationControl'] :
-        (in_array((string)($this->settings['cbgmNavigationControl'] ?? ''), preg_split("/[\s]*[,][\s]*/", $this->settings['valid']['navigationControl'] ?? [])) ?
+        (in_array((string)($this->settings['cbgmNavigationControl'] ?? ''), $this->toStringList($this->settings['valid']['navigationControl'] ?? [])) ?
             $this->settings['cbgmNavigationControl'] :
             ($this->settings['display']['navigationControl'] ?? ''));
 
@@ -240,9 +265,18 @@ private function getMapStyling()
             
             
 
-            // add optional or required given key
-            if (!empty($this->settings['googleapi']['key']))
-                $googleMapsUri .= '?key=' . $this->settings['googleapi']['key'];
+            // Aktuelle Google-Maps-JS-API: dynamischer Bibliotheks-Import.
+            // Ohne loading=async und libraries liefert Google nur den Legacy-Loader,
+            // in dem google.maps.Marker/Geocoder nicht mehr garantiert sind.
+            $googleMapsParameters = [
+                'v' => 'weekly',
+                'loading' => 'async',
+                'libraries' => 'marker,geocoding',
+            ];
+            if (!empty($this->settings['googleapi']['key']) && !str_contains($googleMapsUri, 'key=')) {
+                $googleMapsParameters['key'] = $this->settings['googleapi']['key'];
+            }
+            $googleMapsUri .= (str_contains($googleMapsUri, '?') ? '&' : '?') . http_build_query($googleMapsParameters);
 
             // add google api file
 //            $GLOBALS['TSFE']->additionalHeaderData['cbgooglemaps'] =

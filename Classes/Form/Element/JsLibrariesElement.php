@@ -3,62 +3,72 @@
 namespace Brinkert\Cbgooglemaps\Form\Element;
 
 use TYPO3\CMS\Backend\Form\Element\AbstractFormElement;
-use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 class JsLibrariesElement extends AbstractFormElement
 {
+    use PluginTypoScriptTrait;
+
     public function render(): array
     {
-        $cm = GeneralUtility::makeInstance(ConfigurationManager::class);
-        $ts = $cm->getConfiguration($cm::CONFIGURATION_TYPE_FULL_TYPOSCRIPT);
         $filePath = 'EXT:cbgooglemaps/';
 
-        // Defensive: check for settings
-        $settings = [];
-        if (
-            isset($ts['plugin.']) &&
-            isset($ts['plugin.']['tx_cbgooglemaps.']) &&
-            isset($ts['plugin.']['tx_cbgooglemaps.']['settings.'])
-        ) {
-            $settings = $ts['plugin.']['tx_cbgooglemaps.']['settings.'];
-        }
+        $settings = $this->getPluginSettings();
 
         $pageRenderer = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Page\PageRenderer::class);
 
-        // Only add files if settings are present
-        if (!empty($settings)) {
-            $pageRenderer->addJsFile($filePath . 'Resources/Public/JavaScript/class.gmaps.js',
-                'text/javascript', false, false, '', false);
-            $pageRenderer->addJsFile($filePath . 'Resources/Public/JavaScript/class.geocoding.js',
-                'text/javascript', false, false, '', false);
-            $pageRenderer->addJsFile($filePath . 'Resources/Public/JavaScript/utilities.js',
-                'text/javascript', false, false, '', false);
-
-            if ('Google' === $settings['mapProvider']) {
-                $googleMapsUri = $settings['googleapi.']['uri'];
-                if ($settings['googleapi.']['key'])
-                    $googleMapsUri .= '?key=' . $settings['googleapi.']['key'];
-                $pageRenderer->addJsFile($googleMapsUri, 'text/javascript', false, false, '', true);
-            } else if ('MapBox' === $settings['mapProvider']) {
-                $pageRenderer->addJsFile(
-                    $filePath . 'Resources/Public/JavaScript/mapbox/mapbox-gl-patched.js',
-                    'text/javascript', false, false, '', true);
-                $pageRenderer->addCssFile(
-                    $filePath . 'Resources/Public/JavaScript/mapbox/mapbox-gl.css',
-                    'stylesheet', 'all', '', false, false, '', true);
-            } else {
-                $pageRenderer->addJsFile(
-                    $filePath . 'Resources/Public/JavaScript/leaflet/leaflet-src.js',
-                    'text/javascript', false, false, '', true);
-                $pageRenderer->addCssFile(
-                    $filePath . 'Resources/Public/JavaScript/leaflet/leaflet.css',
-                    'stylesheet', 'all', '', false, false, '', true);
+        $mapProvider = (string)($settings['mapProvider'] ?? '');
+        // add map provider specific libraries
+        if ('Google' === $mapProvider) {
+            // Google Maps JS API: aktueller Stand = dynamischer Bibliotheks-Import
+            // (v=weekly, loading=async, Bibliotheken marker+geocoding)
+            $googleMapsUri = (string)($settings['googleapi.']['uri'] ?? '');
+            if ($googleMapsUri === '') {
+                $googleMapsUri = 'https://maps.googleapis.com/maps/api/js';
             }
+            $googleMapsParameters = [
+                'v' => 'weekly',
+                'loading' => 'async',
+                'libraries' => 'marker,geocoding',
+            ];
+            if (!empty($settings['googleapi.']['key']) && !str_contains($googleMapsUri, 'key=')) {
+                $googleMapsParameters['key'] = $settings['googleapi.']['key'];
+            }
+            $googleMapsUri .= (str_contains($googleMapsUri, '?') ? '&' : '?') . http_build_query($googleMapsParameters);
+            // add google libraries
+            $pageRenderer->addJsFile($googleMapsUri, 'text/javascript', FALSE, FALSE, '', TRUE);
+        } elseif ('MapBox' === $mapProvider) {
+            // add mapbox libraries
+            $pageRenderer->addJsFile(
+                $filePath . 'Resources/Public/JavaScript/mapbox/mapbox-gl.js',
+                'text/javascript', FALSE, FALSE, '', TRUE);
+            $pageRenderer->addCssFile(
+                $filePath . 'Resources/Public/JavaScript/mapbox/mapbox-gl.css',
+                'stylesheet', 'all', '', FALSE, FALSE, '', TRUE);
+        } else {
+            // add openstreetmap libraries
+            $pageRenderer->addJsFile(
+                $filePath . 'Resources/Public/JavaScript/leaflet/leaflet-src.js',
+                'text/javascript', FALSE, FALSE, '', TRUE);
+            $pageRenderer->addCssFile(
+                $filePath . 'Resources/Public/JavaScript/leaflet/leaflet.css',
+                'stylesheet', 'all', '', FALSE, FALSE, '', TRUE);
         }
 
-        // Always return an array
+        // Kontrast der Infoblase: Mapbox setzt im Library-CSS (mapbox-gl.css)
+        // nur den weissen Hintergrund, aber KEINE Schriftfarbe - die Vorschau-
+        // Karte erbte dadurch die Textfarbe ihrer Umgebung (im dunklen Bereich
+        // weiss auf weiss). Dieselbe Regel wie im Frontend
+        // (Resources/Public/Css/cbgooglemaps.css).
+        $pageRenderer->addCssFile(
+            $filePath . 'Resources/Public/Css/cbgooglemaps.css',
+            'stylesheet', 'all', '', FALSE, FALSE, '', TRUE);
+
+        // TYPO3 14: render() hat einen strikten array-Return-Type. Dieses Element
+        // hat kein eigenes Feld-UI - es laedt nur Karten-JS/CSS ins Backend-Formular
+        // (fuer Geo-Coding- und Map-Preview-Button). Ohne return: 500
+        // "JsLibrariesElement::render(): Return value must be of type array, none returned".
         return $this->initializeResultArray();
     }
 }

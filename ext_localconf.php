@@ -5,17 +5,7 @@ defined('TYPO3') or die();
 
 // encapsulate all locally defined variables
 (static function() {
-    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPageTSConfig(
-        '<INCLUDE_TYPOSCRIPT: source="FILE:EXT:cbgooglemaps/Configuration/TsConfig/ContentElementWizard.tsconfig">'
-    );
-    
-    $iconRegistry = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Imaging\IconRegistry::class);
-    
-    $iconRegistry->registerIcon(
-        'ce-default-icon',
-        \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
-        ['source' => 'EXT:cbgooglemaps/Resources/Public/Icons/ce_wiz.svg']
-    );
+    // PageTS auto-load via Configuration/page.tsconfig
     
     \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
         'cbgooglemaps',
@@ -23,9 +13,14 @@ defined('TYPO3') or die();
         [
             \Brinkert\Cbgooglemaps\Controller\MapController::class => 'index',
         ],
-    
+
         // non-cacheable actions
-        []
+        [],
+
+        // TYPO3 13.4: Default ist PLUGIN_TYPE_PLUGIN (list_type), erst mit
+        // PLUGIN_TYPE_CONTENT_ELEMENT entsteht der eigene CType.
+        // TYPO3 14: Default ist bereits CType, die Angabe ist dort wirkungslos.
+        \TYPO3\CMS\Extbase\Utility\ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT
     );
     
     $tStamp = (new Datetime("now"))->getTimestamp();

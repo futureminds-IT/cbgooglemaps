@@ -51,6 +51,20 @@ return Map::fromEntries([
             MutationMode::Extend,
             Directive::ImgSrc,
             SourceScheme::blob
+        ),
+            // Mapbox GL JS ab v2/v3 erzeugt seinen Rendering-Worker aus einem
+            // Blob - ohne worker-src/child-src laeuft er unter default-src
+            // 'self' und wird blockiert: die Karte bleibt leer (kein Fehler
+            // im Formular, nur "mapboxgl is not defined"/leerer Container).
+            new Mutation(
+            MutationMode::Extend,
+            Directive::WorkerSrc,
+            SourceScheme::blob
+        ),
+            new Mutation(
+            MutationMode::Extend,
+            Directive::ChildSrc,
+            SourceScheme::blob
         ),   
             new Mutation(
             MutationMode::Extend,
