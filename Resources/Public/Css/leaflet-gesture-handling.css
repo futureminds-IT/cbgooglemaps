@@ -45,3 +45,6 @@
 
 .leaflet-gesture-handling-scroll-warning:after {
   content: attr(data-gesture-handling-scroll-content); }
+
+/* Leaflet-Attributions-Flagge (politisches Symbol) in Kundenprojekten ausblenden */
+.leaflet-attribution-flag { display: none !important; }
