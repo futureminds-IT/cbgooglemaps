@@ -5,7 +5,6 @@ namespace Brinkert\Cbgooglemaps\Controller;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Service\FlexFormService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Class to extend the backend with a tca user field

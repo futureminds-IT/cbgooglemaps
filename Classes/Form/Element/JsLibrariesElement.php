@@ -17,6 +17,13 @@ class JsLibrariesElement extends AbstractFormElement
         $settings = $this->getPluginSettings();
 
         $pageRenderer = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Page\PageRenderer::class);
+        // add own scripts for gmaps object and mapping functions
+        $pageRenderer->addJsFile($filePath . 'Resources/Public/JavaScript/class.gmaps.js',
+            'text/javascript', FALSE, FALSE, '', FALSE);
+        $pageRenderer->addJsFile($filePath . 'Resources/Public/JavaScript/class.geocoding.js',
+            'text/javascript', FALSE, FALSE, '', FALSE);
+        $pageRenderer->addJsFile($filePath . 'Resources/Public/JavaScript/utilities.js',
+            'text/javascript', FALSE, FALSE, '', FALSE);
 
         $mapProvider = (string)($settings['mapProvider'] ?? '');
         // add map provider specific libraries
