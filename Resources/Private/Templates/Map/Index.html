@@ -200,77 +200,67 @@
     <script>
         window.addEventListener("load", function(event) <f:format.raw>{</f:format.raw>
 
-        // set map
-        var map_{contentId} = L.map('cbsgm_{contentId}', <f:format.raw>{</f:format.raw>
-        center: [{latitude}, {longitude}],
+        // MapLibre GL JS mit Raster-Kacheln (OpenStreetMap Carto) - ersetzt Leaflet.
+        // Achtung: MapLibre erwartet Koordinaten als [Lng, Lat], Leaflet hatte [Lat, Lng].
+        var osmStyle_{contentId} = <f:format.raw>{</f:format.raw>
+            version: 8,
+            sources: <f:format.raw>{</f:format.raw>
+                osm: <f:format.raw>{</f:format.raw>
+                    type: 'raster',
+                    tiles: ['{settings.osmapi.tileLayer.template -> f:format.raw()}'],
+                    tileSize: 256,
+                    maxzoom: 19,
+                    attribution: '{settings.osmapi.tileLayer.attribution -> f:format.raw()}'
+                <f:format.raw>}</f:format.raw>
+            <f:format.raw>}</f:format.raw>,
+            layers: [{ id: 'osm', type: 'raster', source: 'osm' }]
+        <f:format.raw>}</f:format.raw>;
+
+        // cooperativeGestures ersetzt das fruehere leaflet-gesture-handling:
+        // Seite scrollt normal, Strg/Cmd + Scrollen zoomt die Karte.
+        var map_{contentId} = new maplibregl.Map(<f:format.raw>{</f:format.raw>
+            container: 'cbsgm_{contentId}',
+            style: osmStyle_{contentId},
+            center: [{longitude}, {latitude}],
             zoom: {mapZoom},
-            gestureHandling: true,
-        scrollWheelZoom: {useScrollwheel}
+            cooperativeGestures: <f:if condition="{useScrollwheel}"><f:then>false</f:then><f:else>true</f:else></f:if>,
+            attributionControl: <f:format.raw>{</f:format.raw> compact: true <f:format.raw>}</f:format.raw>
         <f:format.raw>}</f:format.raw>);
+        map_{contentId}.addControl(new maplibregl.NavigationControl(<f:format.raw>{</f:format.raw> showCompass: false <f:format.raw>}</f:format.raw>), 'top-left');
 
-
-        // add osm layer
-        L.tileLayer('{settings.osmapi.tileLayer.template -> f:format.raw()}', <f:format.raw>{</f:format.raw>
-        attribution: '{settings.osmapi.tileLayer.attribution -> f:format.raw()}'
-        <f:format.raw>}</f:format.raw>).addTo(map_{contentId});
-
-
-        // add osm icon if given
+        <f:comment>
+            Eigenes Marker-Icon aus den TypoScript-Settings: MapLibre arbeitet mit
+            HTML-Elementen statt Leaflets L.icon. Anker unten = Spitze auf der Koordinate.
+        </f:comment>
         <f:if condition="{settings.osmapi.icon.iconUrl}">
-            var osmIcon_{contentId} = L.icon(<f:format.raw>{</f:format.raw>
-        iconUrl: '{settings.osmapi.icon.iconUrl}',
+        var osmIconElement_{contentId} = document.createElement('img');
+        osmIconElement_{contentId}.src = '{settings.osmapi.icon.iconUrl}';
+        osmIconElement_{contentId}.alt = '';
         <f:if condition="{settings.osmapi.icon.iconWidth}">
             <f:if condition="{settings.osmapi.icon.iconHeight}">
-            iconSize: [{settings.osmapi.icon.iconWidth},{settings.osmapi.icon.iconHeight}],
-        </f:if></f:if>
-        <f:if condition="{settings.osmapi.icon.iconAnchorX}">
-            <f:if condition="{settings.osmapi.icon.iconAnchorY}">
-            iconAnchor: [{settings.osmapi.icon.iconAnchorX},{settings.osmapi.icon.iconAnchorY}],
-        </f:if></f:if>
-        <f:if condition="{settings.osmapi.icon.popupAnchorX}">
-            <f:if condition="{settings.osmapi.icon.popupAnchorY}">
-            popupAnchor: [{settings.osmapi.icon.popupAnchorX},{settings.osmapi.icon.popupAnchorY}],
-        </f:if></f:if>
-        <f:if condition="{settings.osmapi.icon.tooltipAnchorX}">
-            <f:if condition="{settings.osmapi.icon.tooltipAnchorY}">
-            tooltipAnchor: [{settings.osmapi.icon.tooltipAnchorX},{settings.osmapi.icon.tooltipAnchorY}],
-        </f:if></f:if>
-        <f:if condition="{settings.osmapi.icon.shadowUrl}">
-            shadowUrl: {settings.osmapi.icon.shadowUrl},
+        osmIconElement_{contentId}.style.width = '{settings.osmapi.icon.iconWidth}px';
+        osmIconElement_{contentId}.style.height = '{settings.osmapi.icon.iconHeight}px';
+            </f:if>
         </f:if>
-        <f:if condition="{settings.osmapi.icon.shadowWidth}">
-            <f:if condition="{settings.osmapi.icon.shadowHeight}">
-            shadowSize: [{settings.osmapi.icon.shadowWidth},{settings.osmapi.icon.shadowHeight}],
-        </f:if></f:if>
-        <f:if condition="{settings.osmapi.icon.shadowAnchorX}">
-            <f:if condition="{settings.osmapi.icon.shadowAnchorY}">
-            shadowAnchor: [{settings.osmapi.icon.shadowAnchorX},{settings.osmapi.icon.shadowAnchorY}],
-        </f:if></f:if>
+        </f:if>
+
+        var osmMarker_{contentId} = new maplibregl.Marker(<f:format.raw>{</f:format.raw>
+            <f:if condition="{settings.osmapi.icon.iconUrl}">element: osmIconElement_{contentId}, anchor: 'bottom',</f:if>
+            <f:if condition="{settings.osmapi.icon.popupAnchorY}">offset: [0, -{settings.osmapi.icon.popupAnchorY}]</f:if>
         <f:format.raw>}</f:format.raw>);
-        </f:if>
+        osmMarker_{contentId}.setLngLat([{longitude}, {latitude}]).addTo(map_{contentId});
 
-
-        // add marker
-        var osmMarker_{contentId} = L.marker([
-            {latitude}, {longitude}],<f:format.raw>{</f:format.raw>
-            <f:if condition="{settings.osmapi.icon.iconUrl}"> icon: osmIcon_{contentId} </f:if>
-        <f:format.raw>}</f:format.raw>
-        ).addTo(map_{contentId});
-
-
-        // add popup / infotext
+        // Infotext als Popup - gleiche Quelle wie bei Google/Mapbox
         <f:if condition="{infoText}">
-            var infoText_{contentId} = decodeURIComponent("<f:format.html>{infoText}</f:format.html>").replace(/\+/g, ' ');
-
+        var infoText_{contentId} = decodeURIComponent("<f:format.html>{infoText}</f:format.html>").replace(/\+/g, ' ');
+        osmMarker_{contentId}.setPopup(new maplibregl.Popup(<f:format.raw>{</f:format.raw>
+            <f:if condition="{settings.osmapi.icon.popupAnchorY}">offset: [0, -{settings.osmapi.icon.popupAnchorY}]</f:if>
+        <f:format.raw>}</f:format.raw>).setHTML(infoText_{contentId}));
         <f:if condition="{openInfoBox}">
-            <f:then>
-        osmMarker_{contentId}.bindPopup(infoText_{contentId}).openPopup();
-        </f:then>
-        <f:else>
-        osmMarker_{contentId}.bindPopup(infoText_{contentId});
-        </f:else>
+        osmMarker_{contentId}.togglePopup();
         </f:if>
         </f:if>
+
         <f:format.raw>}</f:format.raw>, false);
     </script>
 
@@ -286,11 +276,7 @@
 </f:comment>
 <f:asset.css identifier="cbgooglemapsContrast" href="EXT:cbgooglemaps/Resources/Public/Css/cbgooglemaps.css" />
 <f:comment>
-    Leaflet-Gesture-Handling greift auf das globale L zu und lieff bisher bei
-    jedem Kartenanbieter - bei Google/Mapbox dadurch "L is not defined".
+    Kein zusaetzliches Gesture-Handling mehr: MapLibre bringt cooperativeGestures
+    mit (Seite scrollt, Strg/Cmd + Scrollen zoomt die Karte).
 </f:comment>
-<f:if condition="{mapProvider} == 'OpenStreetMap'">
-<f:asset.script identifier="leafletgesture" src="EXT:cbgooglemaps/Resources/Public/JavaScript/leaflet/leaflet-gesture-handling.js" />
-<f:asset.css identifier="leafletgesture" href="EXT:cbgooglemaps/Resources/Public/Css/leaflet-gesture-handling.css" />
-</f:if>
 </html>

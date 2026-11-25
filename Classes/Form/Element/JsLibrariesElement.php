@@ -56,10 +56,10 @@ class JsLibrariesElement extends AbstractFormElement
         } else {
             // add openstreetmap libraries
             $pageRenderer->addJsFile(
-                $filePath . 'Resources/Public/JavaScript/leaflet/leaflet-src.js',
+                $filePath . 'Resources/Public/JavaScript/maplibre/maplibre-gl.js',
                 'text/javascript', FALSE, FALSE, '', TRUE);
             $pageRenderer->addCssFile(
-                $filePath . 'Resources/Public/JavaScript/leaflet/leaflet.css',
+                $filePath . 'Resources/Public/JavaScript/maplibre/maplibre-gl.css',
                 'stylesheet', 'all', '', FALSE, FALSE, '', TRUE);
         }
 
